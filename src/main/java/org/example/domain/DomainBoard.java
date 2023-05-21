@@ -45,161 +45,31 @@ public class DomainBoard {
     }
 
 
-    /* DE ACA PARA ABAJO REFACTORIZAR EN CLASE GAME*/
 
-    public boolean isMovementPossible(int originX, int originY, int destinationX, int destinationY) {
-        Piece originPiece = board[originX][originY];
-        Piece destinationPiece = board[destinationX][destinationY];
-        boolean movementPossible = false;
 
-        if (turno != originPiece.getColor()){
-            return false;
+   public void makeMove(int originX, int originY, int destinationX, int destinationY){
+        if(board[originX][originY] instanceof Peon){
+            Peon peon = (Peon) board[originX][originY];
+            peon.updateFirstMovement();
         }
+        board[destinationX][destinationY] = board[originX][originY];
+        board[originX][originY] = null;
+   }
 
-        if (originPiece == null) {
-            return false;
-        }
-
-        if (destinationPiece != null && originPiece.getColor().equals(destinationPiece.getColor())) {
-            return false;
-        }
-
-        if (destinationPiece != null) {  // SE DESEA COMER
-            movementPossible = originPiece.isEatingMovementPossible(originX, originY, destinationX, destinationY);
-        }
-
-        if (destinationPiece == null) {
-            movementPossible = originPiece.isMovementPossible(originX, originY, destinationX, destinationY);
-        }
-
-
-        if (movementPossible) {
-            System.out.println(" es posible");
-            if ( ! arePiecesInBetween(originX, originY, destinationX, destinationY)) {
-                board[destinationX][destinationY] = board[originX][originY];
-                board[originX][originY] = null;
-                if (turno.equals(PieceColor.WHITE)) turno = PieceColor.BLACK; else turno = PieceColor.WHITE;
-            }else{
-                movementPossible = false;
-            }
-        }
-
-        //arePiecesInBetween(originX, originY, destinationX, destinationY);
-        return movementPossible;
-
-
-
-        /*  MODIFICAR FUNCION, SOLO TIENE QUE RETORNAR BOOLEANOS, NO ACTUALIZAR TABLERO   */
+    public Piece[][] getBoard() {
+        return copyBoard(board);
     }
 
-
-    public boolean arePiecesInBetween(int originX, int originY, int destinationX, int destinationY) {
-
-        // para no contar al caballo, tenemos en cuenta los movientos entre diagonal, en la misma fila, en la misma columna.
-
-        // diagonal es cuando originx - destinationx es igual  a originY - destinationY
-
-        /*Solo Necesitamos obtener las piezas intermedias de los moviemientos diagonales,en la misma fila o en la misma columna */
-
-
-
-
-
-        /*
-        *
-        *  SOLUCIONAR IF HACIENDO QUE LE RESTE 1 AL ORIGEN Y DESITNO O LE SUME DEPENDIENDO
-        * SUPONGAMOS QUE VAMOS DESDE CASILLA  0-0 A 0-4, EL FOR TIENE QUE IR DE 0-1 A 0-3
-        *
-        * */
-
-
-
-
-
-
-        if (!(Math.abs(originX - destinationX) == 2 && Math.abs(originY - destinationY) == 1) || ((Math.abs((originX - destinationX)) == 1) && (Math.abs((originY - destinationY)) == 2))) {
-            int rowspaces = Math.abs(originX - destinationX);
-            int columnSpaces = Math.abs(originY - destinationY);
-
-
-            if (rowspaces == columnSpaces ) {  // DIAGONAL
-                System.out.println("diagonal");
-
-                if (originX < destinationX && originY < destinationY) {destinationX--; destinationY--;}
-                if (originX > destinationX && originY > destinationY) {destinationX++; destinationY++;}
-
-                if (originX < destinationX && originY > destinationY) {destinationX--; destinationY++;}
-                if (originX > destinationX && originY < destinationY) {destinationX++; destinationY--;}
-
-
-                for (int i=0;i<rowspaces-1;i++){
-                    System.out.println(destinationX + " orig");
-                    System.out.println(destinationX +  " " +destinationY);
-                    if (board[destinationX][destinationY] != null){
-                        return true;
-                    }
-                    if (originX < destinationX && originY < destinationY) {destinationX--; destinationY--;}
-                    if (originX > destinationX && originY > destinationY) {destinationX++; destinationY++;}
-
-                    if (originX < destinationX && originY > destinationY) {destinationX--; destinationY++;}
-                    if (originX > destinationX && originY < destinationY) {destinationX++; destinationY--;}
-                }
-                return false;
-            }
-
-
-
-
-
-            if (Math.abs(originX-destinationX) == 0 /*&& (originY - destinationY) == columnSpaces*/ ) {  // HORIZONTAL
-                System.out.println("horizontal");
-                if (originY<destinationY) destinationY--;
-                if (originY>destinationY) destinationY++;
-
-                for (int i=0;i<columnSpaces-1;i++){
-                    System.out.println(destinationX + " orig");
-                    System.out.println(destinationX +  " " +destinationY);
-                    if (board[destinationX][destinationY] != null){
-                        return true;
-                    }
-                    if (originY<destinationY) destinationY--;
-                    if (originY>destinationY) destinationY++;
-                }
-                return false;
-
-            }
-
-            if (/*(originX-destinationX) == rowspaces &&*/ Math.abs(originY - destinationY) == 0 ) {  // VERTICAL
-                System.out.println("vertical");
-
-
-                if (originX<destinationX) destinationX--;
-                if (originX>destinationX) destinationX++;
-
-                for (int i=0;i<rowspaces-1;i++){
-
-                    System.out.println(destinationX +  " " +destinationY);
-
-                    if (board[destinationX][destinationY] != null){
-                        return true;
-                    }
-                    if (originX<destinationX) destinationX--;
-                    if (originX>destinationX) destinationX++;
-                }
-                return false;
-
-            }
-
-
-
-            return false;
-        }
-
-
-        return false;
-
-
+    public void setBoard(Piece[][] board) {
+        this.board = board;
     }
 
+    private  Piece[][] copyBoard(Piece [][] board){   // HACER STATIC UTILITY CLASS
+        Piece [][] copy = new Piece[board.length][board[0].length];
+        for (int i=0;i<board.length;i++){
+            System.arraycopy( board[i],0,copy[i],0,board.length);
+        }
+        return copy;
+    }
 
 }

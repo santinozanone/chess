@@ -28,7 +28,7 @@ public class Peon extends Piece {
 
 
 
-        if (firstMovementRealized) {
+    /*    if (firstMovementRealized) {
             return movement;
         } else {
 
@@ -39,9 +39,21 @@ public class Peon extends Piece {
             firstMovementRealized = true;
         }
         return movement;
+*/
 
+        if (firstMovementRealized) {
+            return movement;
+        } else {
+            movement = (movement || getColor().equals(PieceColor.WHITE)  && (Math.abs(originX - destinationX) == 2) && (originY == destinationY)
+                    || getColor().equals(PieceColor.BLACK) && (Math.abs(originX - destinationX) == 2) && (originY == destinationY));
+        }
+        return movement;
     }
 
+
+    public void updateFirstMovement(){
+       firstMovementRealized = true;
+    }
 
     public boolean isEatingMovementPossible(int originX, int originY, int destinationX, int destinationY) {
         boolean movement;
@@ -62,9 +74,9 @@ public class Peon extends Piece {
                 movement = blackMovement;
             }
         }
-        if (movement){
+       /* if (movement){
             firstMovementRealized = true;
-        }
+        }*/
         return movement;
 
     }
