@@ -1,7 +1,5 @@
 package org.example.domain;
 
-import org.example.presentation.Board;
-
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -211,10 +209,10 @@ public class GameLogic {
 
 
     public List<PositionDto> getPieceMoves(Piece board[][], int originX, int originY){
-        if (board[originX][originY] == null){
-            return null;
-        }
         List<PositionDto> positions = new ArrayList<>();
+        if (board[originX][originY] == null){
+            return positions;
+        }
 
         for (int i = 0;i<8;i++){
             for (int j=0;j<8;j++) {

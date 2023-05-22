@@ -4,9 +4,7 @@ import org.example.domain.DomainBoard;
 import org.example.domain.GameLogic;
 import org.example.domain.Piece;
 import org.example.domain.PositionDto;
-import org.example.presentation.Board;
 
-import javax.swing.*;
 import java.util.List;
 
 public class GameApplication {
@@ -21,7 +19,6 @@ public class GameApplication {
     public boolean makeMove(int originX, int originY, int destinationX, int destinationY) {
         Piece[][] boardClone = board.getBoard();
 
-        //gameLogic.isCheckMate(board.getBoard());
         boolean succesful = false;
 
         boolean movementPossible = gameLogic.isMovementPossible(board.getBoard(), originX, originY, destinationX, destinationY);
@@ -30,11 +27,9 @@ public class GameApplication {
             if (!piecesInBetween) {
                 board.makeMove(originX, originY, destinationX, destinationY);
                 if (!gameLogic.isKingCheck(board.getBoard())) {
-                    //gameLogic.changeTurn();
                     succesful = true;
                 } else {
                     board.setBoard(boardClone);
-                    //gameLogic.isCheckMate(board.getBoard());
                     succesful = false;
                 }
             }
