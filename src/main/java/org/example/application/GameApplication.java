@@ -3,7 +3,8 @@ package org.example.application;
 import org.example.domain.DomainBoard;
 import org.example.domain.GameLogic;
 import org.example.domain.Piece;
-import org.example.domain.PositionDto;
+import org.example.dto.MoveDto;
+import org.example.dto.PositionDto;
 
 import java.util.List;
 
@@ -16,16 +17,16 @@ public class GameApplication {
         this.gameLogic = gameLogic;
     }
 
-    public boolean makeMove(int originX, int originY, int destinationX, int destinationY) {
+    public boolean makeMove(MoveDto move) {
         Piece[][] boardClone = board.getBoard();
 
         boolean succesful = false;
 
-        boolean movementPossible = gameLogic.isMovementPossible(board.getBoard(), originX, originY, destinationX, destinationY);
+        boolean movementPossible = gameLogic.isMovementPossible(board.getBoard(),move);
         if (movementPossible) {
-            boolean piecesInBetween = gameLogic.arePiecesInBetween(board.getBoard(), originX, originY, destinationX, destinationY);
+            boolean piecesInBetween = gameLogic.arePiecesInBetween(board.getBoard(), move);
             if (!piecesInBetween) {
-                board.makeMove(originX, originY, destinationX, destinationY);
+                board.makeMove(move);
                 if (!gameLogic.isKingCheck(board.getBoard())) {
                     succesful = true;
                 } else {

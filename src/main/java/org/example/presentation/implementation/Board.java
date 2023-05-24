@@ -1,7 +1,6 @@
 package org.example.presentation.implementation;
 
-import org.example.application.GameApplication;
-import org.example.domain.PositionDto;
+import org.example.dto.PositionDto;
 import org.example.presentation.Button;
 import org.example.presentation.interfaces.IPresenter;
 import org.example.presentation.interfaces.IWindowBoard;
@@ -10,8 +9,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 

@@ -1,5 +1,7 @@
 package org.example.domain;
 
+import org.example.dto.MoveDto;
+
 public class DomainBoard {
     private Piece board[][] = new Piece[8][8];
     private Piece whites[] = new Piece[8];
@@ -47,7 +49,12 @@ public class DomainBoard {
 
 
 
-   public void makeMove(int originX, int originY, int destinationX, int destinationY){
+   public void makeMove(MoveDto move){
+       int originX = move.getOriginX();
+       int originY = move.getOriginY();
+       int destinationX = move.getDestinationX();
+       int destinationY = move.getDestinationY();
+
         if(board[originX][originY] instanceof Peon){
             Peon peon = (Peon) board[originX][originY];
             peon.updateFirstMovement();

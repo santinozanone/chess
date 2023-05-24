@@ -1,7 +1,8 @@
 package org.example.presentation.implementation;
 
 import org.example.application.GameApplication;
-import org.example.domain.PositionDto;
+import org.example.dto.MoveDto;
+import org.example.dto.PositionDto;
 import org.example.presentation.Button;
 import org.example.presentation.interfaces.IPresenter;
 import org.example.presentation.interfaces.IWindowBoard;
@@ -26,26 +27,40 @@ public class Presenter implements IPresenter {
     public void onBoxClick(int originX,int originY) {
         Button [][] buttonMatrix = windowBoard.getButtons();
 
-
             if (buttonCounter == 0) {
-                firstBoxClicked = buttonMatrix[originX][originY];
-                positions = gameApplication.getPieceMoves(originX, originY);
-                positions.add(new PositionDto(originX,originY));
-                windowBoard.paintButtons(positions);
-                buttonCounter++;
+                firstBoxClicked(originX,originY,buttonMatrix);
             } else {
-                secondBoxClicked = buttonMatrix[originX][originY];
-                positions.add(new PositionDto(originX,originY));
-                positions.add(new PositionDto(firstBoxClicked.getPositionX(), firstBoxClicked.getPositionY()));
-                buttonCounter = 0;
-
-                boolean isMovePossible = gameApplication.makeMove(firstBoxClicked.getPositionX(), firstBoxClicked.getPositionY(), secondBoxClicked.getPositionX(), secondBoxClicked.getPositionY());
-                if (isMovePossible)
-                    windowBoard.displayMove(firstBoxClicked.getPositionX(), firstBoxClicked.getPositionY(), secondBoxClicked.getPositionX(), secondBoxClicked.getPositionY());
-                else System.err.println("movimiento incapaz");
-                windowBoard.unPaintButtons(positions);
+                secondBoxClicked(originX,originY,buttonMatrix);
+                handleMove();
             }
     }
+
+
+    private void handleMove(){
+        MoveDto move = new MoveDto(firstBoxClicked.getPositionX(), firstBoxClicked.getPositionY(), secondBoxClicked.getPositionX(), secondBoxClicked.getPositionY());
+        boolean isMovePossible = gameApplication.makeMove(move);
+
+        if (isMovePossible)
+            windowBoard.displayMove(firstBoxClicked.getPositionX(), firstBoxClicked.getPositionY(), secondBoxClicked.getPositionX(), secondBoxClicked.getPositionY());
+        else System.err.println("movimiento incapaz");
+        windowBoard.unPaintButtons(positions);
+    }
+
+    private void firstBoxClicked( int originX,int originY, Button [][] buttonMatrix){
+        firstBoxClicked = buttonMatrix[originX][originY];
+        positions = gameApplication.getPieceMoves(originX, originY);
+        positions.add(new PositionDto(originX,originY));
+        windowBoard.paintButtons(positions);
+        buttonCounter++;
+    }
+
+    private void secondBoxClicked( int originX,int originY, Button [][] buttonMatrix){
+        secondBoxClicked = buttonMatrix[originX][originY];
+        positions.add(new PositionDto(originX,originY));
+        positions.add(new PositionDto(firstBoxClicked.getPositionX(), firstBoxClicked.getPositionY()));
+        buttonCounter = 0;
+    }
+
 
     @Override
     public void setView(IWindowBoard view) {

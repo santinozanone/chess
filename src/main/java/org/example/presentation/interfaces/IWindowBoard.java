@@ -1,6 +1,6 @@
 package org.example.presentation.interfaces;
 
-import org.example.domain.PositionDto;
+import org.example.dto.PositionDto;
 import org.example.presentation.Button;
 
 import java.util.List;

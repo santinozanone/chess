@@ -1,5 +1,8 @@
 package org.example.domain;
 
+import org.example.dto.MoveDto;
+import org.example.dto.PositionDto;
+
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +11,12 @@ public class GameLogic {
 
     private PieceColor turno = PieceColor.WHITE;
 
-    public boolean isMovementPossible(Piece[][] board,int originX, int originY, int destinationX, int destinationY) {
+    public boolean isMovementPossible(Piece[][] board, MoveDto move) {
+        int originX = move.getOriginX();
+        int originY = move.getOriginY();
+        int destinationX = move.getDestinationX();
+        int destinationY = move.getDestinationY();
+
         if (board[originX][originY] == null || board[originX][originY] == null  && board[destinationX][destinationY] == null ){
             return false;
         }
@@ -55,6 +63,14 @@ public class GameLogic {
        // return isKingCheck(board)
 
          // UN MOVIMIENTO MIO GENERA JAQUE MATE EN EL OTRO JUGADOR.
+
+       String turnoColor = turno.name();
+       PieceColor originalTurno = PieceColor.valueOf(turnoColor);
+
+            if (turno == PieceColor.BLACK) turno = PieceColor.WHITE ; else turno = PieceColor.BLACK;
+
+
+
         if (isKingCheck(board)) {
 
             Piece[][] boardClone = copyBoard(board);
@@ -104,7 +120,8 @@ public class GameLogic {
                         for (int j = 0; j < 8; j++) {
                             for (PositionDto intermediatePosition : intermediatePositions) {
                                 if (canSaveCheck) continue;
-                                if (isMovementPossible(board, i, j, intermediatePosition.getX(), intermediatePosition.getY()) && !arePiecesInBetween(board, i, j, intermediatePosition.getX(), intermediatePosition.getY())) {
+                                MoveDto move = new MoveDto(i,j,intermediatePosition.getX(), intermediatePosition.getY());
+                                if (isMovementPossible(board, move) && !arePiecesInBetween(board,move)) {
                                     piecesThatSaveCheck++;
                                     canSaveCheck = true;
                                 }
@@ -116,7 +133,7 @@ public class GameLogic {
 
                 if (checkedPositions == kingMoves && piecesThatSaveCheck < piecesCheckingKing.size()) {
                     System.out.println("jaque mate");
-                    JOptionPane.showMessageDialog(null, "jaque mate");
+                    JOptionPane.showMessageDialog(null, "jaque mate, el  ganador es " + originalTurno);
                     return true;
                 }
             }
@@ -136,8 +153,7 @@ public class GameLogic {
         // ver metodo para encontrar las piezas del medio
 
 
-
-
+        turno = originalTurno;
 
         return false;
     }
@@ -158,7 +174,8 @@ public class GameLogic {
 
         for (int i = 0;i<8;i++){
             for (int j=0;j<8;j++){
-                if (board[i][j] != null && board[i][j].getColor() != turno && board[i][j].isEatingMovementPossible(i,j,kingX,kingY) && !arePiecesInBetween(board,i,j,kingX,kingY)){
+                MoveDto move = new MoveDto(i,j,kingX,kingY);
+                if (board[i][j] != null && board[i][j].getColor() != turno && board[i][j].isEatingMovementPossible(i,j,kingX,kingY) && !arePiecesInBetween(board,move)){
                     checkerPieces.add(new PositionDto(i,j));
                 }
             }
@@ -169,42 +186,8 @@ public class GameLogic {
 
 
     public boolean isKingCheck(Piece board[][]){
-        System.out.println("------------------------------------------------------------------------------------------------");
-        boolean checked = false;
-        // obtener rey, luego iterar por el resto de las piezas y comprobar si pueden comer al rey, es decir su espacio
-        int kingX = 0;
-        int kingY = 0;
-        for (int i = 0;i<8;i++){
-            for (int j=0;j<8;j++){
-                if (board[i][j] instanceof Rey && board[i][j].getColor().equals(turno)){
-                    kingX = i;
-                    kingY = j;
-                }
-            }
-        }
-
-        for (int i = 0;i<8;i++){
-            for (int j=0;j<8;j++){
-                if (board[i][j] != null && board[i][j].getColor() != turno && board[i][j].isEatingMovementPossible(i,j,kingX,kingY) && !arePiecesInBetween(board,i,j,kingX,kingY)){
-                    System.out.println(board[i][j].getClass().toString() + " jaque at position  " + i + " " +j + " can eat the king");
-                    checked = true;
-                }
-            }
-        }
-        return checked;
-
-
-        /*
-        * mover pieza
-        * verificar si rey mio esta en jaque, si lo esta el movimiento a realizar tiene que parar el jaque, de lo contrario es ilegal
-        * si rey no esta en jaque moviento es legal.
-        *
-        * */
-
-
-
-
-
+        if (getCheckersPieces(board).size() > 0) return true;
+        return false;
     }
 
 
@@ -216,7 +199,8 @@ public class GameLogic {
 
         for (int i = 0;i<8;i++){
             for (int j=0;j<8;j++) {
-                if(isMovementPossible(board,originX,originY,i,j) && !arePiecesInBetween(board,originX,originY,i,j)){
+                MoveDto move = new MoveDto(originX,originY,i,j);
+                if(isMovementPossible(board,move) && !arePiecesInBetween(board,move)){
                     positions.add(new PositionDto(i,j));
                 }
             }
@@ -314,7 +298,11 @@ public class GameLogic {
 
 
 
-    public boolean arePiecesInBetween(Piece board[][],int originX, int originY, int destinationX, int destinationY) {
+    public boolean arePiecesInBetween(Piece board[][],MoveDto move) {
+        int originX = move.getOriginX();
+        int originY = move.getOriginY();
+        int destinationX = move.getDestinationX();
+        int destinationY = move.getDestinationY();
 
         // para no contar al caballo, tenemos en cuenta los movientos entre diagonal, en la misma fila, en la misma columna.
 

@@ -1,4 +1,4 @@
-package org.example.domain;
+package org.example.dto;
 
 public class PositionDto {
     private int X;
