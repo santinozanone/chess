@@ -1,4 +1,4 @@
-package org.example.domain;
+package org.example.domain.board;
 
 public class Peon extends Piece {
 

@@ -1,8 +1,9 @@
 package org.example;
 
-import org.example.application.GameApplication;
-import org.example.domain.DomainBoard;
-import org.example.domain.GameLogic;
+import org.example.application.ChessAppService;
+import org.example.domain.Game;
+import org.example.domain.board.DomainBoard;
+import org.example.domain.service.GameLogic;
 import org.example.presentation.implementation.Board;
 import org.example.presentation.implementation.Presenter;
 import org.example.presentation.interfaces.IPresenter;
@@ -12,10 +13,15 @@ import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
-        GameApplication gameApplication = new GameApplication(new DomainBoard(),new GameLogic());
-        IPresenter presenter = new Presenter(gameApplication);
-        IWindowBoard board = new Board(presenter);
-        presenter.setView(board);
-        SwingUtilities.invokeLater(() -> board.initializeBoard());
+        DomainBoard board = new DomainBoard();
+        Game game = new Game(board);
+        GameLogic gameLogic = new GameLogic();
+        ChessAppService chessAppService = new ChessAppService(gameLogic,game);
+
+
+        IPresenter presenter = new Presenter(chessAppService);
+        IWindowBoard WindowBoard = new Board(presenter);
+        presenter.setView(WindowBoard);
+        SwingUtilities.invokeLater(() -> WindowBoard.initializeBoard());
     }
 }

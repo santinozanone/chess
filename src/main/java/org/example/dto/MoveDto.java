@@ -6,6 +6,16 @@ public class MoveDto {
     private int destinationX;
     private int destinationY;
 
+    @Override
+    public String toString() {
+        return "MoveDto{" +
+                "originX=" + originX +
+                ", originY=" + originY +
+                ", destinationX=" + destinationX +
+                ", destinationY=" + destinationY +
+                '}';
+    }
+
     public MoveDto(int originX, int originY, int destinationX, int destinationY) {
         this.originX = originX;
         this.originY = originY;

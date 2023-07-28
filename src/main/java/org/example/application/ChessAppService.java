@@ -1,24 +1,27 @@
 package org.example.application;
 
-import org.example.domain.DomainBoard;
-import org.example.domain.GameLogic;
-import org.example.domain.Piece;
+import org.example.domain.Game;
+import org.example.domain.board.DomainBoard;
+import org.example.domain.board.PieceColor;
+import org.example.domain.service.GameLogic;
 import org.example.dto.MoveDto;
+import org.example.dto.MovementStatus;
 import org.example.dto.PositionDto;
 
 import java.util.List;
 
-public class GameApplication {
-    private DomainBoard board;
+public class ChessAppService {
     private GameLogic gameLogic;
 
-    public GameApplication(DomainBoard board, GameLogic gameLogic) {
-        this.board = board;
+    private Game game;
+
+    public ChessAppService(GameLogic gameLogic, Game game) {
         this.gameLogic = gameLogic;
+        this.game = game;
     }
 
     public boolean makeMove(MoveDto move) {
-        Piece[][] boardClone = board.getBoard();
+       /* Piece[][] boardClone = board.getBoard();
 
         boolean succesful = false;
 
@@ -40,12 +43,33 @@ public class GameApplication {
         }
 
 
-        return false;
+        return false;*/
+
+        DomainBoard board = game.getBoard();
+        PieceColor turno = game.getTurno();
+        MovementStatus movementStatus = gameLogic.isMovePossible(board,move,turno);
+        game.makeMove(move,movementStatus);
+
+
+
+        /*
+        * DICEW JAQUE MATE CUANDO NO ES PORQUE EN VEZ DE OBTENER CUALQUIER CASILLA INTERMEDIA, OBTIENE LAS QUE TIENEN ALGUNA PIEZA DENTRO
+        *
+        *
+        *
+        *
+        * */
+
+        return movementStatus.isMovementPossible() &&  !movementStatus.isKingChecked();
+
+
+
+
     }
 
 
     public List<PositionDto> getPieceMoves(int originX, int originY) {
-        return gameLogic.getPieceMoves(board.getBoard(), originX, originY);
+        return gameLogic.getPieceMoves(game.getBoard().getBoard(), originX, originY,game.getTurno());
     }
 
 

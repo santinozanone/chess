@@ -1,6 +1,7 @@
-package org.example.domain;
+package org.example.domain.board;
 
 import org.example.dto.MoveDto;
+import org.example.util.MatrixCopyUtil;
 
 public class DomainBoard {
     private Piece board[][] = new Piece[8][8];
@@ -64,19 +65,13 @@ public class DomainBoard {
    }
 
     public Piece[][] getBoard() {
-        return copyBoard(board);
+        return MatrixCopyUtil.copyMatrix(board);
     }
 
     public void setBoard(Piece[][] board) {
         this.board = board;
     }
 
-    private  Piece[][] copyBoard(Piece [][] board){   // HACER STATIC UTILITY CLASS
-        Piece [][] copy = new Piece[board.length][board[0].length];
-        for (int i=0;i<board.length;i++){
-            System.arraycopy( board[i],0,copy[i],0,board.length);
-        }
-        return copy;
-    }
+
 
 }

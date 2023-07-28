@@ -1,6 +1,6 @@
 package org.example.presentation.implementation;
 
-import org.example.application.GameApplication;
+import org.example.application.ChessAppService;
 import org.example.dto.MoveDto;
 import org.example.dto.PositionDto;
 import org.example.presentation.Button;
@@ -11,15 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Presenter implements IPresenter {
-    private GameApplication gameApplication;
+    private ChessAppService chessAppService;
     private IWindowBoard windowBoard;
     private int buttonCounter = 0;
     private Button firstBoxClicked;
     private Button secondBoxClicked;
     List<PositionDto> positions = new ArrayList<>();
 
-    public Presenter(GameApplication gameApplication) {
-        this.gameApplication = gameApplication;
+    public Presenter(ChessAppService chessAppService) {
+        this.chessAppService = chessAppService;
     }
 
 
@@ -38,7 +38,7 @@ public class Presenter implements IPresenter {
 
     private void handleMove(){
         MoveDto move = new MoveDto(firstBoxClicked.getPositionX(), firstBoxClicked.getPositionY(), secondBoxClicked.getPositionX(), secondBoxClicked.getPositionY());
-        boolean isMovePossible = gameApplication.makeMove(move);
+        boolean isMovePossible = chessAppService.makeMove(move);
 
         if (isMovePossible)
             windowBoard.displayMove(firstBoxClicked.getPositionX(), firstBoxClicked.getPositionY(), secondBoxClicked.getPositionX(), secondBoxClicked.getPositionY());
@@ -48,7 +48,7 @@ public class Presenter implements IPresenter {
 
     private void firstBoxClicked( int originX,int originY, Button [][] buttonMatrix){
         firstBoxClicked = buttonMatrix[originX][originY];
-        positions = gameApplication.getPieceMoves(originX, originY);
+        positions = chessAppService.getPieceMoves(originX, originY);
         positions.add(new PositionDto(originX,originY));
         windowBoard.paintButtons(positions);
         buttonCounter++;
@@ -65,6 +65,5 @@ public class Presenter implements IPresenter {
     @Override
     public void setView(IWindowBoard view) {
         this.windowBoard = view;
-
     }
 }
