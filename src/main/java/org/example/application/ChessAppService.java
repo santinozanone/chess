@@ -47,8 +47,10 @@ public class ChessAppService {
 
         DomainBoard board = game.getBoard();
         PieceColor turno = game.getTurno();
-        MovementStatus movementStatus = gameLogic.isMovePossible(board,move,turno);
+        MovementStatus movementStatus = gameLogic.getMoveStatus(board,move,turno);
+
         game.makeMove(move,movementStatus);
+
 
 
 
@@ -69,7 +71,7 @@ public class ChessAppService {
 
 
     public List<PositionDto> getPieceMoves(int originX, int originY) {
-        return gameLogic.getPieceMoves(game.getBoard().getBoard(), originX, originY,game.getTurno());
+        return gameLogic.getPossibleMoves(game.getBoard(), new PositionDto(originX, originY),game.getTurno());
     }
 
 

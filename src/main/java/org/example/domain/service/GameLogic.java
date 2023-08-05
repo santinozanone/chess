@@ -12,13 +12,12 @@ import org.example.util.MatrixCopyUtil;
 
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 public class GameLogic {
 
-    public MovementStatus isMovePossible(DomainBoard domainBoard, MoveDto moveDto, PieceColor turno) {
+    private MovementStatus isMovePossible(DomainBoard domainBoard, MoveDto moveDto, PieceColor turno) {
         Piece[][] boardMatrix = domainBoard.getBoard();
         MovementStatus movementStatus = new MovementStatus();
         boolean movementPossible = isMovementPossible(boardMatrix, moveDto, turno);
@@ -27,7 +26,6 @@ public class GameLogic {
             return movementStatus;
         }
         boolean piecesInBetween = arePiecesInBetween(boardMatrix, moveDto);
-        Piece[][] matrixClone = domainBoard.getBoard();
         if (!piecesInBetween) {
             movementStatus.setMovementPossible(true);
             boardMatrix[moveDto.getDestinationX()][moveDto.getDestinationY()] = boardMatrix[moveDto.getOriginX()][moveDto.getOriginY()];
@@ -36,12 +34,17 @@ public class GameLogic {
                 movementStatus.setKingChecked(false);
             } else {
                 movementStatus.setKingChecked(true);
-                boardMatrix = MatrixCopyUtil.copyMatrix(matrixClone);
             }
         }
-        movementStatus.setCheckMate(isCheckMate(boardMatrix, turno));
+        return movementStatus;
+    }
 
 
+    public MovementStatus getMoveStatus(DomainBoard domainBoard, MoveDto moveDto, PieceColor turno){
+        Piece[][] boardMatrix = domainBoard.getDeppCopyBoard();
+        MovementStatus movementStatus = isMovePossible(domainBoard, moveDto, turno);
+        movementStatus.setCheckMate(isCheckMate2(domainBoard.getBoard(), turno));
+        if (!movementStatus.isCheckMate()) domainBoard.setBoard(boardMatrix); // Si el movimiento no es jaque mate  volvemos a el estado original del tablero
         return movementStatus;
     }
 
@@ -79,60 +82,6 @@ public class GameLogic {
     }
 
 
-    private boolean isCheckMate(Piece board[][], PieceColor turno) {
-        String turnoColor = turno.name();
-        PieceColor originalTurno = PieceColor.valueOf(turnoColor);
-
-        if (turno == PieceColor.BLACK) turno = PieceColor.WHITE;
-        else turno = PieceColor.BLACK;
-
-        if (isKingCheck(board, turno)) {
-            Piece[][] boardClone = MatrixCopyUtil.copyMatrix(board);
-            int checkedPositions = 0;
-            int piecesThatSaveCheck = 0;
-
-            int positions[] = getPiecePosition(board, Rey.class, turno);
-            int kingX = positions[0];
-            int kingY = positions[1];
-
-            List<PositionDto> kingPositions = getPieceMoves(board, kingX, kingY, turno); // el getmoves considera todos los lugares, incluso los con jaque
-            if (kingPositions.size() > 0) {
-                int kingMoves = kingPositions.size();
-                for (PositionDto position : kingPositions) {
-                    board[position.getX()][position.getY()] = board[kingX][kingY];
-                    board[kingX][kingY] = null;
-                    if (isKingCheck(board, turno)) {
-                        checkedPositions++;
-                    }
-                    board = MatrixCopyUtil.copyMatrix(boardClone);
-                }
-
-                List<PositionDto> pieceCheckingKing = getCheckersPieces(board, turno);
-                List<PositionDto> intermediatePositions = getPiecesInBetween(board, new NotFilterStrategy(), kingX, kingY, pieceCheckingKing.get(0).getX(), pieceCheckingKing.get(0).getY());
-
-                outerloop:
-                for (int i = 0; i < 8; i++) { // verifica que las demas piezas puedan ponerse en el medio
-                    for (int j = 0; j < 8; j++) {
-                        for (PositionDto intermediatePosition : intermediatePositions) {
-                            MoveDto move = new MoveDto(i, j, intermediatePosition.getX(), intermediatePosition.getY());
-                            if ((!(board[i][j] instanceof Rey)) && isMovementPossible(board, move, turno) && !arePiecesInBetween(board, move)) {
-                                piecesThatSaveCheck++;
-                                break outerloop;
-                            }
-                        }
-                    }
-                }
-
-                if (checkedPositions == kingMoves && piecesThatSaveCheck < pieceCheckingKing.size()) {
-                    JOptionPane.showMessageDialog(null, "jaque mate, el  ganador es " + originalTurno);
-                    return true;
-                }
-            }
-        }
-        turno = originalTurno;
-
-        return false;
-    }
 
     private int[] getPiecePosition(Piece board[][], Class<? extends Piece> piece, PieceColor turno) {
         int positions[] = new int[2];
@@ -141,7 +90,6 @@ public class GameLogic {
                 if (board[i][j] != null && board[i][j].getClass().equals(piece) && board[i][j].getColor().equals(turno)) {
                     positions[0] = i;
                     positions[1] = j;
-                    System.out.println(i + " " + j);
                 }
             }
         }
@@ -170,24 +118,6 @@ public class GameLogic {
     private boolean isKingCheck(Piece board[][], PieceColor turno) {
         if (getCheckersPieces(board, turno).size() > 0) return true;
         return false;
-    }
-
-
-    public List<PositionDto> getPieceMoves(Piece board[][], int originX, int originY, PieceColor turno) {
-        List<PositionDto> positions = new ArrayList<>();
-        if (board[originX][originY] == null) {
-            return positions;
-        }
-
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                MoveDto move = new MoveDto(originX, originY, i, j);
-                if (isMovementPossible(board, move, turno) && !arePiecesInBetween(board, move)) {
-                    positions.add(new PositionDto(i, j));
-                }
-            }
-        }
-        return positions;
     }
 
 
@@ -257,8 +187,7 @@ public class GameLogic {
             if (Math.abs(originY - destinationY) == 0) {  // VERTICAL
                 if (originX < destinationX) destinationX--;
                 if (originX > destinationX) destinationX++;
-                for (int i = 0; i < rowspaces - 1; i++) {
-                    System.out.println(rowspaces);
+                for (int i = 0; i < rowspaces -1; i++) {
                     if (filterStrategy.filter(board[destinationX][destinationY])) {
                         piecesInBetween.add(new PositionDto(destinationX, destinationY));
                     }
@@ -279,5 +208,68 @@ public class GameLogic {
             arePiecesInBetween = (getPiecesInBetween(board, new PieceNotNullStrategy(), move.getOriginX(), move.getOriginY(), move.getDestinationX(), move.getDestinationY()).size()) != 0;
         }
         return arePiecesInBetween;
+    }
+
+
+
+    public List<PositionDto> getPossibleMoves(DomainBoard domainBoard,PositionDto positionDto, PieceColor turno) {
+        List<PositionDto> possibleMoves = new ArrayList<>();
+        Piece[][] boardMatrix = domainBoard.getDeppCopyBoard();
+        Piece[][] boardClone = domainBoard.getDeppCopyBoard();
+        MovementStatus movementStatus;
+        DomainBoard board = new DomainBoard();
+        board.setBoard(boardMatrix);
+
+        for (int i = 0;i<8;i++){
+            for (int j = 0; j<8; j++){
+                movementStatus = isMovePossible(board,new MoveDto(positionDto.getX(), positionDto.getY(),i,j),turno);
+                if (movementStatus.isMovementPossible() && !movementStatus.isKingChecked() /*&& !status.isCheckMate() */){
+                    possibleMoves.add(new PositionDto(i,j));
+                }
+                board.setBoard(MatrixCopyUtil.copyMatrix(boardClone));
+            }
+        }
+        return possibleMoves;
+    }
+
+
+    private boolean isCheckMate2(Piece board[][], PieceColor turno) {
+        String turnoColor = turno.name();
+        PieceColor originalTurno = PieceColor.valueOf(turnoColor);
+
+        if (turno == PieceColor.BLACK) turno = PieceColor.WHITE;
+        else turno = PieceColor.BLACK;
+
+        if (isKingCheck(board, turno)) {
+            System.out.println("jaque");
+            int piecesThatSaveCheck = 0;
+            int positions[] = getPiecePosition(board, Rey.class, turno);
+            int kingX = positions[0];
+            int kingY = positions[1];
+            DomainBoard board1 = new DomainBoard();
+            board1.setBoard(board);
+            List<PositionDto> kingPositions = getPossibleMoves(board1, new PositionDto(kingX, kingY), turno);
+            List<PositionDto> pieceCheckingKing = getCheckersPieces(board, turno);
+            List<PositionDto> intermediatePositions = getPiecesInBetween(board, new NotFilterStrategy(), kingX, kingY, pieceCheckingKing.get(0).getX(), pieceCheckingKing.get(0).getY());
+
+            outerloop:
+            for (int i = 0; i < 8; i++) { // verifica que las demas piezas puedan ponerse en el medio
+                for (int j = 0; j < 8; j++) {
+                    for (PositionDto intermediatePosition : intermediatePositions) {
+                        MoveDto move = new MoveDto(i, j, intermediatePosition.getX(), intermediatePosition.getY());
+                        if ((!(board[i][j] instanceof Rey)) && isMovementPossible(board, move, turno) && !arePiecesInBetween(board, move)) {
+                            piecesThatSaveCheck++;
+                            break outerloop;
+                        }
+                    }
+                }
+            }
+            if (kingPositions.size() == 0 && piecesThatSaveCheck < pieceCheckingKing.size()) {
+                JOptionPane.showMessageDialog(null, "jaque mate, el  ganador es " + originalTurno);
+                return true;
+            }
+        }
+        turno = originalTurno;
+        return false;
     }
 }

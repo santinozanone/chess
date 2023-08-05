@@ -64,9 +64,15 @@ public class DomainBoard {
         board[originX][originY] = null;
    }
 
-    public Piece[][] getBoard() {
+    public Piece[][] getDeppCopyBoard() {
         return MatrixCopyUtil.copyMatrix(board);
     }
+
+    public Piece[][] getBoard() {
+        return board;
+    }
+
+
 
     public void setBoard(Piece[][] board) {
         this.board = board;
