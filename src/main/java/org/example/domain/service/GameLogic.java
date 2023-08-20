@@ -40,11 +40,12 @@ public class GameLogic {
     }
 
 
-    public MovementStatus getMoveStatus(DomainBoard domainBoard, MoveDto moveDto, PieceColor turno){
+    public MovementStatus getMoveStatus(DomainBoard domainBoard, MoveDto moveDto, PieceColor turno) {
         Piece[][] boardMatrix = domainBoard.getDeppCopyBoard();
         MovementStatus movementStatus = isMovePossible(domainBoard, moveDto, turno);
         movementStatus.setCheckMate(isCheckMate2(domainBoard.getBoard(), turno));
-        if (!movementStatus.isCheckMate()) domainBoard.setBoard(boardMatrix); // Si el movimiento no es jaque mate  volvemos a el estado original del tablero
+        if (!movementStatus.isCheckMate())
+            domainBoard.setBoard(boardMatrix); // Si el movimiento no es jaque mate  volvemos a el estado original del tablero
         return movementStatus;
     }
 
@@ -82,7 +83,6 @@ public class GameLogic {
     }
 
 
-
     private int[] getPiecePosition(Piece board[][], Class<? extends Piece> piece, PieceColor turno) {
         int positions[] = new int[2];
         for (int i = 0; i < 8; i++) {
@@ -110,8 +110,6 @@ public class GameLogic {
             }
         }
         return checkerPieces;
-
-
     }
 
 
@@ -127,74 +125,49 @@ public class GameLogic {
             int rowspaces = Math.abs(originX - destinationX);
             int columnSpaces = Math.abs(originY - destinationY);
 
-
-            if (rowspaces == columnSpaces) { // vertical
-                int mayorX = 0, mayorY = 0, menorX = 0, menorY = 0;
-
-                mayorY = Math.max(originY, destinationY);
-                mayorX = Math.max(originX, destinationX);
-                menorX = Math.min(originX, destinationX);
-                menorY = Math.min(originY, destinationY);
-
-
-                List<Integer> listX = new ArrayList<>();
-                List<Integer> listY = new ArrayList<>();
-
+            if (rowspaces == columnSpaces) { // diagonal
+                int mayorY = Math.max(originY, destinationY);
+                int mayorX = Math.max(originX, destinationX);
+                int menorX = Math.min(originX, destinationX);
+                int menorY = Math.min(originY, destinationY);
+                int iterationNumber = 0;
                 for (int i = menorX + 1; i < mayorX; i++) {
-                    listX.add(i);
-                }
-                if (originX != menorX) {
-                    Collections.reverse(listX);
-                }
+                    int x = 0;
+                    int y = 0;
+                    if (menorX == originX) x = (mayorX - 1) - iterationNumber;
+                    else x = i;
 
-                for (int j = menorY + 1; j < mayorY; j++) {
-                    listY.add(j);
-                }
+                    if (menorY == originY) y = (mayorY - 1) - iterationNumber;
+                    else y = (menorY + 1) + iterationNumber;
 
-                if (originY != menorY) {
-                    Collections.reverse(listY);
-                }
-
-
-                if (listX.isEmpty() || listY.isEmpty()) {
-                    return piecesInBetween;
-                }
-
-                for (int i = 0; i < listX.size(); i++) {
-                    if (filterStrategy.filter(board[listX.get(i)][listY.get(i)])) {
-                        piecesInBetween.add(new PositionDto(listX.get(i), listY.get(i)));
+                    PositionDto positionDto = new PositionDto(x, y);
+                    if (filterStrategy.filter(board[positionDto.getX()][positionDto.getY()])) {
+                        piecesInBetween.add(positionDto);
                     }
+                    iterationNumber++;
                 }
-                return piecesInBetween;
             }
 
             if (Math.abs(originX - destinationX) == 0) {  // HORIZONTAL
-
-                if (originY < destinationY) destinationY--;
-                if (originY > destinationY) destinationY++;
-
-                for (int i = 0; i < columnSpaces - 1; i++) {
-                    if (filterStrategy.filter(board[destinationX][destinationY])) {
-                        piecesInBetween.add(new PositionDto(destinationX, destinationY));
-                    }
-                    if (originY < destinationY) destinationY--;
-                    if (originY > destinationY) destinationY++;
-                }
-                return piecesInBetween;
-
+                piecesInBetween = getPositionsInBetween(originY, destinationY, originX, board, filterStrategy, false);
             }
-
             if (Math.abs(originY - destinationY) == 0) {  // VERTICAL
-                if (originX < destinationX) destinationX--;
-                if (originX > destinationX) destinationX++;
-                for (int i = 0; i < rowspaces -1; i++) {
-                    if (filterStrategy.filter(board[destinationX][destinationY])) {
-                        piecesInBetween.add(new PositionDto(destinationX, destinationY));
-                    }
-                    if (originX < destinationX) destinationX--;
-                    if (originX > destinationX) destinationX++;
-                }
-                return piecesInBetween;
+                piecesInBetween = getPositionsInBetween(originX, destinationX, originY, board, filterStrategy, true);
+            }
+        }
+        return piecesInBetween;
+    }
+
+    private List<PositionDto> getPositionsInBetween(int firstOrigin, int firstDestination, int secondOrigin, Piece[][] board, FilterStrategy filterStrategy, boolean verticalIteration) {
+        int mayor = Math.max(firstOrigin, firstDestination);
+        int menor = Math.min(firstOrigin, firstDestination);
+        List<PositionDto> piecesInBetween = new ArrayList<>();
+        PositionDto positionDto = null;
+        for (int i = menor + 1; i < mayor; i++) {
+            if (verticalIteration) positionDto = new PositionDto(i, secondOrigin);
+            else positionDto = new PositionDto(secondOrigin, i);
+            if (filterStrategy.filter(board[positionDto.getX()][positionDto.getY()])) {
+                piecesInBetween.add(positionDto);
             }
         }
         return piecesInBetween;
@@ -210,9 +183,7 @@ public class GameLogic {
         return arePiecesInBetween;
     }
 
-
-
-    public List<PositionDto> getPossibleMoves(DomainBoard domainBoard,PositionDto positionDto, PieceColor turno) {
+    public List<PositionDto> getPossibleMoves(DomainBoard domainBoard, PositionDto positionDto, PieceColor turno) {
         List<PositionDto> possibleMoves = new ArrayList<>();
         Piece[][] boardMatrix = domainBoard.getDeppCopyBoard();
         Piece[][] boardClone = domainBoard.getDeppCopyBoard();
@@ -220,11 +191,11 @@ public class GameLogic {
         DomainBoard board = new DomainBoard();
         board.setBoard(boardMatrix);
 
-        for (int i = 0;i<8;i++){
-            for (int j = 0; j<8; j++){
-                movementStatus = isMovePossible(board,new MoveDto(positionDto.getX(), positionDto.getY(),i,j),turno);
-                if (movementStatus.isMovementPossible() && !movementStatus.isKingChecked() /*&& !status.isCheckMate() */){
-                    possibleMoves.add(new PositionDto(i,j));
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                movementStatus = isMovePossible(board, new MoveDto(positionDto.getX(), positionDto.getY(), i, j), turno);
+                if (movementStatus.isMovementPossible() && !movementStatus.isKingChecked() /*&& !status.isCheckMate() */) {
+                    possibleMoves.add(new PositionDto(i, j));
                 }
                 board.setBoard(MatrixCopyUtil.copyMatrix(boardClone));
             }
@@ -255,6 +226,15 @@ public class GameLogic {
             outerloop:
             for (int i = 0; i < 8; i++) { // verifica que las demas piezas puedan ponerse en el medio
                 for (int j = 0; j < 8; j++) {
+                    for (PositionDto checker: pieceCheckingKing){
+                        MoveDto move = new MoveDto(i, j, checker.getX(), checker.getY());
+                        if (isMovementPossible(board, move, turno) && !arePiecesInBetween(board, move)) {
+                            System.out.println(i + " " + j);
+                            piecesThatSaveCheck++;
+                            break outerloop;
+                        }
+                    }
+
                     for (PositionDto intermediatePosition : intermediatePositions) {
                         MoveDto move = new MoveDto(i, j, intermediatePosition.getX(), intermediatePosition.getY());
                         if ((!(board[i][j] instanceof Rey)) && isMovementPossible(board, move, turno) && !arePiecesInBetween(board, move)) {
@@ -264,6 +244,7 @@ public class GameLogic {
                     }
                 }
             }
+          //  System.out.println(piecesThatSaveCheck);
             if (kingPositions.size() == 0 && piecesThatSaveCheck < pieceCheckingKing.size()) {
                 JOptionPane.showMessageDialog(null, "jaque mate, el  ganador es " + originalTurno);
                 return true;

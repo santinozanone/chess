@@ -13,12 +13,9 @@ public class Game {
         this.board = board;
     }
 
-    public void makeMove(MoveDto movement, MovementStatus status){
-        if(status.isMovementPossible() && !status.isCheckMate() && !status.isKingChecked()){
+    public void makeMove(MoveDto movement){
             board.makeMove(movement);
             switchTurn();
-        }
-
     }
 
 

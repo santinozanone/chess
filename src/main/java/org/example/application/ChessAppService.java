@@ -21,52 +21,15 @@ public class ChessAppService {
     }
 
     public boolean makeMove(MoveDto move) {
-       /* Piece[][] boardClone = board.getBoard();
-
-        boolean succesful = false;
-
-        boolean movementPossible = gameLogic.isMovementPossible(board.getBoard(),move);
-        if (movementPossible) {
-            boolean piecesInBetween = gameLogic.arePiecesInBetween(board.getBoard(), move);
-            if (!piecesInBetween) {
-                board.makeMove(move);
-                if (!gameLogic.isKingCheck(board.getBoard())) {
-                    succesful = true;
-                } else {
-                    board.setBoard(boardClone);
-                    succesful = false;
-                }
-            }
-            gameLogic.isCheckMate(board.getBoard());
-            if (succesful) gameLogic.changeTurn();
-            return succesful;
-        }
-
-
-        return false;*/
-
         DomainBoard board = game.getBoard();
         PieceColor turno = game.getTurno();
         MovementStatus movementStatus = gameLogic.getMoveStatus(board,move,turno);
 
-        game.makeMove(move,movementStatus);
-
-
-
-
-        /*
-        * DICEW JAQUE MATE CUANDO NO ES PORQUE EN VEZ DE OBTENER CUALQUIER CASILLA INTERMEDIA, OBTIENE LAS QUE TIENEN ALGUNA PIEZA DENTRO
-        *
-        *
-        *
-        *
-        * */
+        if(movementStatus.isMovementPossible() && !movementStatus.isCheckMate() && !movementStatus.isKingChecked()) {
+            game.makeMove(move);
+        }
 
         return movementStatus.isMovementPossible() &&  !movementStatus.isKingChecked();
-
-
-
-
     }
 
 
