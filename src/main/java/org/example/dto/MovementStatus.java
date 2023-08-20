@@ -32,4 +32,12 @@ public class MovementStatus {
         return isCheckMate;
     }
 
+    @Override
+    public String toString() {
+        return "MovementStatus{" +
+                "isMovementPossible=" + isMovementPossible +
+                ", isKingChecked=" + isKingChecked +
+                ", isCheckMate=" + isCheckMate +
+                '}';
+    }
 }

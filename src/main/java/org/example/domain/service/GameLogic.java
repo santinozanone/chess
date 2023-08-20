@@ -223,16 +223,22 @@ public class GameLogic {
             List<PositionDto> pieceCheckingKing = getCheckersPieces(board, turno);
             List<PositionDto> intermediatePositions = getPiecesInBetween(board, new NotFilterStrategy(), kingX, kingY, pieceCheckingKing.get(0).getX(), pieceCheckingKing.get(0).getY());
 
+
+
+
             outerloop:
             for (int i = 0; i < 8; i++) { // verifica que las demas piezas puedan ponerse en el medio
                 for (int j = 0; j < 8; j++) {
                     for (PositionDto checker: pieceCheckingKing){
                         MoveDto move = new MoveDto(i, j, checker.getX(), checker.getY());
-                        if (isMovementPossible(board, move, turno) && !arePiecesInBetween(board, move)) {
+                        Piece matrix2[][] = board1.getDeppCopyBoard();
+                        MovementStatus movementStatus = isMovePossible(board1, move, turno);
+                        if (movementStatus.isMovementPossible() && !movementStatus.isKingChecked() && !movementStatus.isCheckMate()) {
                             System.out.println(i + " " + j);
                             piecesThatSaveCheck++;
                             break outerloop;
                         }
+                        board1.setBoard(matrix2);
                     }
 
                     for (PositionDto intermediatePosition : intermediatePositions) {
@@ -244,7 +250,6 @@ public class GameLogic {
                     }
                 }
             }
-          //  System.out.println(piecesThatSaveCheck);
             if (kingPositions.size() == 0 && piecesThatSaveCheck < pieceCheckingKing.size()) {
                 JOptionPane.showMessageDialog(null, "jaque mate, el  ganador es " + originalTurno);
                 return true;
