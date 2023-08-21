@@ -23,23 +23,7 @@ public class Peon extends Piece {
             movement = blackMovement;
         }
 
-
         // CHEQUEAR SI PEON QUE HAY DETRAS REALIZO MOVIMIENTO DOBLE EN EL TURNO ANTERIOR Y HACER PEASANT
-
-
-
-    /*    if (firstMovementRealized) {
-            return movement;
-        } else {
-
-            movement = (movement || getColor().equals(PieceColor.WHITE)  && (Math.abs(originX - destinationX) == 2) && (originY == destinationY)
-                         || getColor().equals(PieceColor.BLACK) && (Math.abs(originX - destinationX) == 2) && (originY == destinationY));
-        }
-        if (movement) {
-            firstMovementRealized = true;
-        }
-        return movement;
-*/
 
         if (firstMovementRealized) {
             return movement;
@@ -74,9 +58,7 @@ public class Peon extends Piece {
                 movement = blackMovement;
             }
         }
-       /* if (movement){
-            firstMovementRealized = true;
-        }*/
+
         return movement;
 
     }

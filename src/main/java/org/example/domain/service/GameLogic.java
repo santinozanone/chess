@@ -224,8 +224,6 @@ public class GameLogic {
             List<PositionDto> intermediatePositions = getPiecesInBetween(board, new NotFilterStrategy(), kingX, kingY, pieceCheckingKing.get(0).getX(), pieceCheckingKing.get(0).getY());
 
 
-
-
             outerloop:
             for (int i = 0; i < 8; i++) { // verifica que las demas piezas puedan ponerse en el medio
                 for (int j = 0; j < 8; j++) {
@@ -234,13 +232,11 @@ public class GameLogic {
                         Piece matrix2[][] = board1.getDeppCopyBoard();
                         MovementStatus movementStatus = isMovePossible(board1, move, turno);
                         if (movementStatus.isMovementPossible() && !movementStatus.isKingChecked() && !movementStatus.isCheckMate()) {
-                            System.out.println(i + " " + j);
                             piecesThatSaveCheck++;
                             break outerloop;
                         }
                         board1.setBoard(matrix2);
                     }
-
                     for (PositionDto intermediatePosition : intermediatePositions) {
                         MoveDto move = new MoveDto(i, j, intermediatePosition.getX(), intermediatePosition.getY());
                         if ((!(board[i][j] instanceof Rey)) && isMovementPossible(board, move, turno) && !arePiecesInBetween(board, move)) {
@@ -259,3 +255,6 @@ public class GameLogic {
         return false;
     }
 }
+
+
+
