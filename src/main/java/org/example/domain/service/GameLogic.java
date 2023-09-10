@@ -2,6 +2,7 @@ package org.example.domain.service;
 
 import org.example.domain.board.*;
 import org.example.domain.board.Piece;
+import org.example.domain.board.logger.LoggerMove;
 import org.example.domain.strategy.FilterStrategy;
 import org.example.domain.strategy.NotFilterStrategy;
 import org.example.domain.strategy.PieceNotNullStrategy;
@@ -12,7 +13,6 @@ import org.example.util.MatrixCopyUtil;
 
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class GameLogic {
@@ -26,10 +26,10 @@ public class GameLogic {
             return movementStatus;
         }
         boolean piecesInBetween = arePiecesInBetween(boardMatrix, moveDto);
-        if (!piecesInBetween) {
+        if (!piecesInBetween) { // verify that there are not pieces in between the positions
             movementStatus.setMovementPossible(true);
             boardMatrix[moveDto.getDestinationX()][moveDto.getDestinationY()] = boardMatrix[moveDto.getOriginX()][moveDto.getOriginY()];
-            boardMatrix[moveDto.getOriginX()][moveDto.getOriginY()] = null;
+            boardMatrix[moveDto.getOriginX()][moveDto.getOriginY()] = null;  // we make the movement and check if the the king is in check or not
             if (!isKingCheck(boardMatrix, turno)) {
                 movementStatus.setKingChecked(false);
             } else {
@@ -131,15 +131,13 @@ public class GameLogic {
                 int menorX = Math.min(originX, destinationX);
                 int menorY = Math.min(originY, destinationY);
                 int iterationNumber = 0;
+                int x = 0;
+                int y = 0;
                 for (int i = menorX + 1; i < mayorX; i++) {
-                    int x = 0;
-                    int y = 0;
                     if (menorX == originX) x = (mayorX - 1) - iterationNumber;
                     else x = i;
-
                     if (menorY == originY) y = (mayorY - 1) - iterationNumber;
                     else y = (menorY + 1) + iterationNumber;
-
                     PositionDto positionDto = new PositionDto(x, y);
                     if (filterStrategy.filter(board[positionDto.getX()][positionDto.getY()])) {
                         piecesInBetween.add(positionDto);
@@ -201,6 +199,12 @@ public class GameLogic {
             }
         }
         return possibleMoves;
+    }
+
+
+
+    public List<PositionDto> getSpecialMoves(DomainBoard domainBoard, List<LoggerMove> moves, PieceColor turno){
+       return new SpecialMoves().isEnPassantPossible(moves, domainBoard.getBoard(), turno);
     }
 
 

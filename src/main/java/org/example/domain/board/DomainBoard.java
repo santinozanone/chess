@@ -1,6 +1,7 @@
 package org.example.domain.board;
 
 import org.example.dto.MoveDto;
+import org.example.dto.PositionDto;
 import org.example.util.MatrixCopyUtil;
 
 public class DomainBoard {
@@ -37,14 +38,8 @@ public class DomainBoard {
 
             }
         }
-
-        for (int i = 7; i <= 7; i++) {
-            System.arraycopy(whites, 0, board[i], 0, 8);
-        }
-
-        for (int i = 0; i <= 0; i++) {
-            System.arraycopy(blacks, 0, board[i], 0, 8);
-        }
+        System.arraycopy(whites, 0, board[7], 0, 8);
+        System.arraycopy(blacks, 0, board[0], 0, 8);
     }
 
 
@@ -55,13 +50,13 @@ public class DomainBoard {
        int originY = move.getOriginY();
        int destinationX = move.getDestinationX();
        int destinationY = move.getDestinationY();
-
-        if(board[originX][originY] instanceof Peon){
-            Peon peon = (Peon) board[originX][originY];
-            peon.updateFirstMovement();
-        }
         board[destinationX][destinationY] = board[originX][originY];
         board[originX][originY] = null;
+   }
+
+   public void makeEnPassantMove(MoveDto moveDto, PositionDto positionDto){
+        makeMove(moveDto);
+        board[positionDto.getX()][positionDto.getY()] = null;
    }
 
     public Piece[][] getDeppCopyBoard() {
@@ -72,12 +67,8 @@ public class DomainBoard {
         return board;
     }
 
-
-
     public void setBoard(Piece[][] board) {
         this.board = board;
     }
-
-
 
 }

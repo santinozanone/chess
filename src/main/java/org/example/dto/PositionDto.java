@@ -17,4 +17,11 @@ public class PositionDto {
         return Y;
     }
 
+    @Override
+    public String toString() {
+        return "PositionDto{" +
+                "X=" + X +
+                ", Y=" + Y +
+                '}';
+    }
 }

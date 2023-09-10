@@ -25,7 +25,7 @@ public class Peon extends Piece {
 
         // CHEQUEAR SI PEON QUE HAY DETRAS REALIZO MOVIMIENTO DOBLE EN EL TURNO ANTERIOR Y HACER PEASANT
 
-        if (firstMovementRealized) {
+        if  ( (getColor().equals(PieceColor.BLACK) && originX != 1) || (getColor().equals(PieceColor.WHITE) && originX != 6) ) { // verify if pawn is at its original position
             return movement;
         } else {
             movement = (movement || getColor().equals(PieceColor.WHITE)  && (Math.abs(originX - destinationX) == 2) && (originY == destinationY)
@@ -35,9 +35,6 @@ public class Peon extends Piece {
     }
 
 
-    public void updateFirstMovement(){
-       firstMovementRealized = true;
-    }
 
     public boolean isEatingMovementPossible(int originX, int originY, int destinationX, int destinationY) {
         boolean movement;
