@@ -1,7 +1,5 @@
 package org.example.dto;
 
-import org.example.domain.board.PieceColor;
-
 public class MovementStatus {
     private boolean isMovementPossible,isKingChecked,isCheckMate;
 

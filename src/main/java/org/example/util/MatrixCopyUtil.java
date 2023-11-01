@@ -1,6 +1,6 @@
 package org.example.util;
 
-import org.example.domain.board.Piece;
+import org.example.domain.board.piece.Piece;
 
 public class MatrixCopyUtil {
     public static Piece[][] copyMatrix(Piece [][] board){

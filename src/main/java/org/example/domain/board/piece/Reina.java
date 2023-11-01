@@ -1,9 +1,9 @@
-package org.example.domain.board;
+package org.example.domain.board.piece;
 
-public class Rey extends Piece {
+public class Reina extends Piece{
 
 
-    public Rey(PieceColor color) {
+    public Reina(PieceColor color) {
         super(color);
     }
 
@@ -13,15 +13,12 @@ public class Rey extends Piece {
         int columnSpaces = Math.abs(originY - destinationY);
         boolean diagonal = rowspaces == columnSpaces;
         boolean horizontalOrVertical = Math.abs(originX-destinationX) == 0 || Math.abs(originY - destinationY) == 0;
+        return  diagonal  || horizontalOrVertical;
 
-        boolean oneMove = Math.abs(originX-destinationX  )==1 && Math.abs(originY-destinationY  )==1 || Math.abs(originX-destinationX  )==0 && Math.abs(originY-destinationY  )==1 || Math.abs(originX-destinationX  )==0 && Math.abs(originY-destinationY  )==0 || Math.abs(originX-destinationX  )==1 && Math.abs(originY-destinationY  )==0;
-        return  oneMove && diagonal  || oneMove && horizontalOrVertical;
     }
-
 
     @Override
     public boolean isEatingMovementPossible(int originX, int originY, int destinationX, int destinationY) {
         return isMovementPossible(originX, originY, destinationX, destinationY);
     }
-
 }

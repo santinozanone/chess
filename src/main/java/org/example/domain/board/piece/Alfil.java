@@ -1,4 +1,4 @@
-package org.example.domain.board;
+package org.example.domain.board.piece;
 
 public class Alfil extends Piece {
 

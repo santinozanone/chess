@@ -1,8 +1,9 @@
 package org.example.domain;
 
 import org.example.domain.board.DomainBoard;
-import org.example.domain.board.Piece;
-import org.example.domain.board.PieceColor;
+import org.example.domain.board.movements.Move;
+import org.example.domain.board.piece.Piece;
+import org.example.domain.board.piece.PieceColor;
 import org.example.domain.board.logger.LoggerMove;
 import org.example.domain.service.GameLogic;
 import org.example.dto.MoveDto;
@@ -27,15 +28,15 @@ public class Game {
 
     public boolean makeMove(MoveDto movement){
 
-        MovementStatus movementStatus = gameLogic.getMoveStatus(board,movement,turno);
-        if(movementStatus.isMovementPossible() && !movementStatus.isCheckMate() && !movementStatus.isKingChecked()) {
-            logMove(movement);
-            board.makeMove(movement);
+        Move move  = gameLogic.getMove(board, board.getMoveList(), movement, turno);
+        if (move != null){
+            board.makeMove2(move);
+            board.logMove(move);
             switchTurn();
+            return true;
         }
-        return movementStatus.isMovementPossible() &&  !movementStatus.isKingChecked();
-
-        //refactorizar y retornar MovementStatus
+        System.out.println("no se puede hacer");
+        return false;
 
     }
 
@@ -60,7 +61,7 @@ public class Game {
     }
 
     public List<PositionDto> getPieceMoves(int originX, int originY) {
-        gameLogic.getSpecialMoves(board, movementsMade, turno);
-        return gameLogic.getPossibleMoves(board, new PositionDto(originX, originY),turno);
+       // gameLogic.getSpecialMoves(board, board.getMoveList(), new PositionDto(originX, originY),turno);
+        return gameLogic.getPossibleMoves(board,board.getMoveList(), new PositionDto(originX, originY),turno);
     }
 }

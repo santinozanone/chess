@@ -1,15 +1,20 @@
 package org.example.domain.board;
 
+import org.example.domain.board.movements.Move;
+import org.example.domain.board.piece.*;
 import org.example.dto.MoveDto;
-import org.example.dto.PositionDto;
 import org.example.util.MatrixCopyUtil;
 
-public class DomainBoard {
+import java.util.ArrayList;
+import java.util.List;
+
+public class DomainBoard   {
     private Piece board[][] = new Piece[8][8];
     private Piece whites[] = new Piece[8];
     private Piece black[] = new Piece[8];
 
-    PieceColor turno = PieceColor.WHITE;
+    private List<Move> moveList = new ArrayList<>();
+
     public DomainBoard() {
         loadPieces(whites, PieceColor.WHITE);
         loadPieces(black, PieceColor.BLACK);
@@ -50,14 +55,27 @@ public class DomainBoard {
        int originY = move.getOriginY();
        int destinationX = move.getDestinationX();
        int destinationY = move.getDestinationY();
+
         board[destinationX][destinationY] = board[originX][originY];
         board[originX][originY] = null;
    }
 
-   public void makeEnPassantMove(MoveDto moveDto, PositionDto positionDto){
-        makeMove(moveDto);
-        board[positionDto.getX()][positionDto.getY()] = null;
-   }
+
+    public void makeMove2(Move move){
+
+        move.makeMove(board);
+    }
+
+    public void logMove(Move move){
+        moveList.add(move);
+    }
+    public void undoMove(){
+        if (moveList.size()>0){
+            moveList.get(moveList.size()-1).undoMove(board);
+            moveList.remove(moveList.size()-1);
+        }
+    }
+
 
     public Piece[][] getDeppCopyBoard() {
         return MatrixCopyUtil.copyMatrix(board);
@@ -71,4 +89,7 @@ public class DomainBoard {
         this.board = board;
     }
 
+    public List<Move> getMoveList() {
+        return moveList;
+    }
 }
