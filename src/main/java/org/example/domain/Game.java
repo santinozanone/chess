@@ -28,11 +28,13 @@ public class Game {
 
     public boolean makeMove(MoveDto movement){
 
-        Move move  = gameLogic.getMove(board, board.getMoveList(), movement, turno);
+        Move move  = gameLogic.isSingleMovePossible(board, board.getMoveList(), movement, turno);
         if (move != null){
             board.makeMove2(move);
             board.logMove(move);
+            gameLogic.isCheckMate(board.getBoard(), board.getMoveList(), turno); // find a place to call this method
             switchTurn();
+
             return true;
         }
         System.out.println("no se puede hacer");

@@ -50,7 +50,7 @@ public class DomainBoard   {
 
 
 
-   public void makeMove(MoveDto move){
+   private void makeMove(MoveDto move){
        int originX = move.getOriginX();
        int originY = move.getOriginY();
        int destinationX = move.getDestinationX();

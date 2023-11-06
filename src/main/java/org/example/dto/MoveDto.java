@@ -1,5 +1,7 @@
 package org.example.dto;
 
+import java.util.Objects;
+
 public class MoveDto {
     private int originX;
     private int originY;
@@ -37,5 +39,18 @@ public class MoveDto {
 
     public int getDestinationY() {
         return destinationY;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MoveDto moveDto = (MoveDto) o;
+        return originX == moveDto.originX && originY == moveDto.originY && destinationX == moveDto.destinationX && destinationY == moveDto.destinationY;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(originX, originY, destinationX, destinationY);
     }
 }
