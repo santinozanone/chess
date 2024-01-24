@@ -39,4 +39,12 @@ public class StandardMove implements Move{
     public MoveDto getMoveDto() {
         return moveDto;
     }
+
+    @Override
+    public String toString() {
+        return "StandardMove{" +
+                "moveDto=" + moveDto +
+                ", pieceEaten=" + pieceEaten +
+                '}';
+    }
 }

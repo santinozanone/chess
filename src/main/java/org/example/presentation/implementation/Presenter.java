@@ -1,6 +1,9 @@
 package org.example.presentation.implementation;
 
-import org.example.domain.Game;
+import org.example.domain.application.Game;
+import org.example.dto.MovementStatus;
+import org.example.domain.board.GameStatus;
+import org.example.domain.board.MovementState;
 import org.example.dto.MoveDto;
 import org.example.dto.PositionDto;
 import org.example.presentation.Button;
@@ -20,13 +23,11 @@ public class Presenter implements IPresenter {
 
     public Presenter(Game game) {
         this.game = game;
+
     }
-
-
     @Override
     public void onBoxClick(int originX,int originY) {
         Button [][] buttonMatrix = windowBoard.getButtons();
-
             if (buttonCounter == 0) {
                 firstBoxClicked(originX,originY,buttonMatrix);
             } else {
@@ -38,12 +39,28 @@ public class Presenter implements IPresenter {
 
     private void handleMove(){
         MoveDto move = new MoveDto(firstBoxClicked.getPositionX(), firstBoxClicked.getPositionY(), secondBoxClicked.getPositionX(), secondBoxClicked.getPositionY());
-        boolean isMovePossible = game.makeMove(move);
+        MovementStatus movementStatus = game.isMovePossible(move);
+        if (movementStatus.getState() == MovementState.POSSIBLE){
+            game.makeMove(movementStatus.getMove());
+        }
+        if (movementStatus.getState() == MovementState.PAWN_PROMOTION){
+           new PawnPromotionWindow(game.getTurn(),game, movementStatus.getMove());
+        }
+        GameStatus gameStatus = game.getGameStatus();
 
-        if (isMovePossible)
-            windowBoard.displayMove(firstBoxClicked.getPositionX(), firstBoxClicked.getPositionY(), secondBoxClicked.getPositionX(), secondBoxClicked.getPositionY());
-        else System.err.println("movimiento incapaz");
+        if (gameStatus == GameStatus.KING_IN_CHECK){
+            windowBoard.displayMessage( gameStatus.getValue(),movementStatus.getState().getValue());
+        }
+        else if (gameStatus == GameStatus.CHECKMATE){
+             // should display checkmate window
+        }
+        else if (gameStatus == GameStatus.STALEMATE){
+              // should display stalemate window
+        }
+        windowBoard.displayMessage( gameStatus.getValue(),movementStatus.getState().getValue());
+
         windowBoard.unPaintButtons(positions);
+        windowBoard.displayTurn(game.getTurn().toString());
     }
 
     private void firstBoxClicked( int originX,int originY, Button [][] buttonMatrix){

@@ -1,41 +1,30 @@
 package org.example.dto;
 
+import org.example.domain.board.MovementState;
+import org.example.domain.board.movements.Move;
+
 public class MovementStatus {
-    private boolean isMovementPossible,isKingChecked,isCheckMate;
+    private boolean isMovementPossible;
+    private MovementState movementState;
 
-    public MovementStatus() {
-    }
+    private Move move;
 
-    public void setMovementPossible(boolean movementPossible) {
-        isMovementPossible = movementPossible;
-    }
 
-    public void setKingChecked(boolean kingChecked) {
-        isKingChecked = kingChecked;
-    }
-
-    public void setCheckMate(boolean checkMate) {
-        isCheckMate = checkMate;
+    public MovementStatus(boolean isMovementPossible, MovementState movementState, Move move) {
+            this.isMovementPossible = isMovementPossible;
+            this.movementState = movementState;
+            this.move = move;
     }
 
     public boolean isMovementPossible() {
         return isMovementPossible;
     }
 
-    public boolean isKingChecked() {
-        return isKingChecked;
+    public MovementState getState() {
+        return movementState;
     }
 
-    public boolean isCheckMate() {
-        return isCheckMate;
-    }
-
-    @Override
-    public String toString() {
-        return "MovementStatus{" +
-                "isMovementPossible=" + isMovementPossible +
-                ", isKingChecked=" + isKingChecked +
-                ", isCheckMate=" + isCheckMate +
-                '}';
+    public Move getMove() {
+        return move;
     }
 }

@@ -2,8 +2,9 @@ package org.example.domain.board;
 
 import org.example.domain.board.movements.Move;
 import org.example.domain.board.piece.*;
-import org.example.dto.MoveDto;
-import org.example.util.MatrixCopyUtil;
+import org.example.presentation.Button;
+import org.example.presentation.implementation.Board;
+import org.example.presentation.interfaces.IWindowBoard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,8 @@ public class DomainBoard   {
     private Piece black[] = new Piece[8];
 
     private List<Move> moveList = new ArrayList<>();
+
+    private List<IWindowBoard> boards = new ArrayList<>();
 
     public DomainBoard() {
         loadPieces(whites, PieceColor.WHITE);
@@ -36,9 +39,9 @@ public class DomainBoard   {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (i == 1) {
-                    board[i][j] = new Peon(PieceColor.BLACK, board);
+                    board[i][j] = new Peon(PieceColor.BLACK);
                 } else if (i == 6) {
-                    board[i][j] = new Peon(PieceColor.WHITE, board);
+                    board[i][j] = new Peon(PieceColor.WHITE);
                 }
 
             }
@@ -47,21 +50,17 @@ public class DomainBoard   {
         System.arraycopy(blacks, 0, board[0], 0, 8);
     }
 
+    public void addListener(IWindowBoard board){
+        this.boards.add(board);
+    }
 
+    public void notifyChange(){
+        for (IWindowBoard b:boards){
+            b.updateBoard(this.board);
+        }
+    }
 
-
-   private void makeMove(MoveDto move){
-       int originX = move.getOriginX();
-       int originY = move.getOriginY();
-       int destinationX = move.getDestinationX();
-       int destinationY = move.getDestinationY();
-
-        board[destinationX][destinationY] = board[originX][originY];
-        board[originX][originY] = null;
-   }
-
-
-    public void makeMove2(Move move){
+    public void makeMove(Move move){
 
         move.makeMove(board);
     }
@@ -77,9 +76,6 @@ public class DomainBoard   {
     }
 
 
-    public Piece[][] getDeppCopyBoard() {
-        return MatrixCopyUtil.copyMatrix(board);
-    }
 
     public Piece[][] getBoard() {
         return board;

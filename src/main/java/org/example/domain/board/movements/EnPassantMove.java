@@ -32,4 +32,11 @@ public class EnPassantMove extends StandardMove {
     public PositionDto getPositionDto() {
         return positionDto;
     }
+
+    @Override
+    public String toString() {
+        return "EnPassantMove{" +
+                "piece to be eaten=" + positionDto +
+                '}';
+    }
 }

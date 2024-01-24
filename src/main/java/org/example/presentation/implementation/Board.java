@@ -1,5 +1,7 @@
 package org.example.presentation.implementation;
 
+import org.example.domain.board.piece.Piece;
+import org.example.domain.board.piece.PieceColor;
 import org.example.dto.PositionDto;
 import org.example.presentation.Button;
 import org.example.presentation.interfaces.IPresenter;
@@ -14,11 +16,15 @@ import java.util.concurrent.ExecutionException;
 
 public class Board implements ActionListener, IWindowBoard {
 
-    IPresenter presenter;
+   private IPresenter presenter;
+    private JLabel movementStatusLabel;
+    private JLabel kingInCheckLabel;
+    private JLabel turnLabel;
 
 
     public Board(IPresenter presenter) {
         this.presenter = presenter;
+        SwingUtilities.invokeLater(() -> initializeBoard());
     }
 
     private org.example.presentation.Button[][] buttonMatrix= new org.example.presentation.Button[8][8];
@@ -26,19 +32,54 @@ public class Board implements ActionListener, IWindowBoard {
 
     @Override
     public void initializeBoard() {
+        JPanel gamePanel = new JPanel();
+        gamePanel.setPreferredSize(new Dimension(1300,800));
+        gamePanel.setLayout(new BorderLayout());
+
         GridLayout g = new GridLayout(8, 8);
-        JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(1000, 800));
-        panel.setDoubleBuffered(true);
-        panel.setLayout(g);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setPreferredSize(new Dimension(1000, 800));
+        buttonPanel.setDoubleBuffered(true);
+        buttonPanel.setLayout(g);
+
+        gamePanel.add(buttonPanel,BorderLayout.WEST);
+
+        JPanel messagePanel = new JPanel();
+        messagePanel.setPreferredSize(new Dimension(300,400));
+        messagePanel.setLayout(new GridLayout(3, 1));
+
+        turnLabel = new JLabel();
+        turnLabel.setText("TURN :" + " WHITE");
+        turnLabel.setFont(new Font("arial",Font.PLAIN,25));
+        turnLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+
+        movementStatusLabel = new JLabel();
+        movementStatusLabel.setText("Game Started");
+        movementStatusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        movementStatusLabel.setFont(new Font("arial",Font.PLAIN,20));
+
+        kingInCheckLabel = new JLabel();
+        kingInCheckLabel.setText("");
+        kingInCheckLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        kingInCheckLabel.setFont(new Font("arial",Font.PLAIN,25));
+
+
+        messagePanel.add(turnLabel);
+        messagePanel.add(movementStatusLabel);
+        messagePanel.add(kingInCheckLabel);
+
+
+        gamePanel.add(messagePanel,BorderLayout.EAST);
+
         JFrame frame = new JFrame("Chess game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(panel);
+        frame.add(gamePanel);
         frame.pack();
         frame.setVisible(true);
-        frame.setLocationRelativeTo(null);  // PONE EL FRAME EN EL MEDIO DE LA PANTALLA
-        frame.setMinimumSize(new Dimension(500, 400));
-        addButtonToPanel(panel);
+        frame.setLocationRelativeTo(null);
+        frame.setMinimumSize(new Dimension(1000, 800));
+        addButtonToPanel(buttonPanel);
 
     }
 
@@ -143,10 +184,41 @@ public class Board implements ActionListener, IWindowBoard {
     }
 
     @Override
-    public void displayMove(int originX, int originY, int destinationX, int destinationY) {
-       buttonMatrix[destinationX][destinationY].setIcon(buttonMatrix[originX][originY].getIcon());
-       buttonMatrix[originX][originY].setIcon(null);
+    public void updateBoard(Piece[][] pieceMatrix) {
+        for (int i = 0; i<8; i++){
+            for (int j = 0; j<8; j++){
+                if (pieceMatrix[i][j] == null && buttonMatrix[i][j].getIcon() != null){
+                   buttonMatrix[i][j].setIcon(null);
+                }
+                else if (pieceMatrix[i][j] != null && buttonMatrix[i][j].getIcon() == null){
+                    setIconToBoard(pieceMatrix, i, j);
+               }
+                else if (pieceMatrix[i][j] != null && buttonMatrix[i][j].getIcon() != null){
+                    String desc = ((ImageIcon)buttonMatrix[i][j].getIcon()).getDescription();
+                    if (! desc.contains(pieceMatrix[i][j].getColor().toString().toLowerCase())){
+                       setIconToBoard(pieceMatrix, i, j);
+                    }
+                }
+            }
+        }
     }
+    private void setIconToBoard(Piece pieceMatrix[][],int i ,int j){
+        java.net.URL imgURL;
+        if (pieceMatrix[i][j].getColor() == PieceColor.BLACK) imgURL = getClass().getResource("/blackPieces/" + pieceMatrix[i][j].getClass().getSimpleName()+".png");
+        else imgURL = getClass().getResource("/whitePieces/" + pieceMatrix[i][j].getClass().getSimpleName()+".png");
+        buttonMatrix[i][j].setIcon(new ImageIcon(imgURL));
+    }
+
+    public void displayMessage(String firstMessage,String secondMessage){
+        this.movementStatusLabel.setText(firstMessage);
+        this.kingInCheckLabel.setText(secondMessage);
+    }
+
+    public void displayTurn(String turn ){
+        turnLabel.setText("TURN : " + turn);
+    }
+
+
 }
 
 

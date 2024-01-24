@@ -2,13 +2,8 @@ package org.example.domain.board.piece;
 
 public class Peon extends Piece {
 
-    private boolean firstMovementRealized = false;
-
-    private Piece board[][];
-
-    public Peon(PieceColor color,Piece board [][]) {
+    public Peon(PieceColor color) {
         super(color);
-        this.board = board;
     }
 
     @Override
@@ -23,7 +18,7 @@ public class Peon extends Piece {
             movement = blackMovement;
         }
 
-        // CHEQUEAR SI PEON QUE HAY DETRAS REALIZO MOVIMIENTO DOBLE EN EL TURNO ANTERIOR Y HACER PEASANT
+
 
         if  ( (getColor().equals(PieceColor.BLACK) && originX != 1) || (getColor().equals(PieceColor.WHITE) && originX != 6) ) { // verify if pawn is at its original position
             return movement;
