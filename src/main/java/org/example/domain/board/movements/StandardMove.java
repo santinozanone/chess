@@ -32,7 +32,7 @@ public class StandardMove implements Move{
 
     }
 
-    public Piece getPieceEaten() {
+    protected Piece getPieceEaten() {
         return pieceEaten;
     }
 

@@ -24,6 +24,39 @@ public class DomainBoard   {
         loadBoard(board, whites, black);
     }
 
+    public void addListener(IWindowBoard board){
+        this.boards.add(board);
+    }
+
+    public void notifyChange(){
+        for (IWindowBoard b:boards){
+            b.updateBoard(this.board);
+        }
+    }
+
+    public Piece getPiece(int x, int y){
+        return board[x][y];
+    }
+
+    public void makeMove(Move move){
+        move.makeMove(board);
+    }
+
+    public void logMove(Move move){
+        moveList.add(move);
+    }
+    public void undoMove(){
+        if (moveList.size()>0){
+            moveList.get(moveList.size()-1).undoMove(board);
+            moveList.remove(moveList.size()-1);
+        }
+    }
+
+    public List<Move> getMoveList() {
+        return moveList;
+    }
+
+
     private void loadPieces(Piece pieces[], PieceColor color) {
         pieces[0] = new Torre(color);
         pieces[1] = new Caballo(color);
@@ -50,42 +83,4 @@ public class DomainBoard   {
         System.arraycopy(blacks, 0, board[0], 0, 8);
     }
 
-    public void addListener(IWindowBoard board){
-        this.boards.add(board);
-    }
-
-    public void notifyChange(){
-        for (IWindowBoard b:boards){
-            b.updateBoard(this.board);
-        }
-    }
-
-    public void makeMove(Move move){
-
-        move.makeMove(board);
-    }
-
-    public void logMove(Move move){
-        moveList.add(move);
-    }
-    public void undoMove(){
-        if (moveList.size()>0){
-            moveList.get(moveList.size()-1).undoMove(board);
-            moveList.remove(moveList.size()-1);
-        }
-    }
-
-
-
-    public Piece[][] getBoard() {
-        return board;
-    }
-
-    public void setBoard(Piece[][] board) {
-        this.board = board;
-    }
-
-    public List<Move> getMoveList() {
-        return moveList;
-    }
 }

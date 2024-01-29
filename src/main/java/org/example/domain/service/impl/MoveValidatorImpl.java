@@ -1,5 +1,8 @@
 package org.example.domain.service.impl;
 
+import org.example.domain.service.interfaces.CheckMovementValidator;
+import org.example.domain.service.interfaces.MoveValidator;
+import org.example.domain.service.interfaces.PositionValidator;
 import org.example.dto.MovementStatus;
 import org.example.domain.board.DomainBoard;
 import org.example.domain.board.MovementState;
@@ -21,50 +24,16 @@ import org.example.dto.PositionDto;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MoveValidatorHandler {
+public class MoveValidatorImpl implements MoveValidator {
 
-    private PositionHandler positionHandler;
-    private CheckMovementHandlerImpl checkMovementHandler;
+    private PositionValidator positionHandler;
+    private CheckMovementValidator checkMovementHandler;
 
 
-    public MoveValidatorHandler(PositionHandler positionHandler, CheckMovementHandlerImpl checkMovementHandler) {
+    public MoveValidatorImpl(PositionValidator positionHandler, CheckMovementValidator checkMovementHandler) {
         this.positionHandler = positionHandler;
         this.checkMovementHandler = checkMovementHandler;
     }
-
-    public boolean isPieceMovementValid(Piece[][] boardMatrix, MoveDto move, PieceColor turn) {
-        int originX = move.getOriginX();
-        int originY = move.getOriginY();
-        int destinationX = move.getDestinationX();
-        int destinationY = move.getDestinationY();
-
-        if (boardMatrix[originX][originY] == null || boardMatrix[originX][originY] == null && boardMatrix[destinationX][destinationY] == null) {
-            return false;
-        }
-        Piece originPiece = boardMatrix[originX][originY];
-        Piece destinationPiece = boardMatrix[destinationX][destinationY];
-
-        boolean movementValid = false;
-
-        if (turn != originPiece.getColor()) {
-            return false;
-        }
-
-        if (destinationPiece != null && originPiece.getColor().equals(destinationPiece.getColor())) {
-            return false;
-        }
-
-        if (destinationPiece != null) {
-            movementValid = originPiece.isEatingMovementPossible(originX, originY, destinationX, destinationY);
-        }
-
-        if (destinationPiece == null) {
-            movementValid = originPiece.isMovementPossible(originX, originY, destinationX, destinationY);
-        }
-
-        return movementValid;
-    }
-
 
     public List<PositionDto> getPossibleMovesOfPiece(DomainBoard domainBoard, List<Move> moves, PositionDto positionDto, PieceColor turno) {
         List<PositionDto> possibleMoves = new ArrayList<>();
@@ -95,19 +64,47 @@ public class MoveValidatorHandler {
         return isMoveValid(domainBoard, movementStatus.getMove(), movementStatus.getState(), turno);
     }
 
+    private boolean isPieceMovementValid(DomainBoard board, MoveDto move, PieceColor turn) {
+        int originX = move.getOriginX();
+        int originY = move.getOriginY();
+        int destinationX = move.getDestinationX();
+        int destinationY = move.getDestinationY();
+        if (board.getPiece( originX,originY) == null ||board.getPiece( originX,originY) == null && board.getPiece( originX,originY) == null) {
+            return false;
+        }
+        Piece originPiece = board.getPiece( originX,originY);
+        Piece destinationPiece = board.getPiece( destinationX,destinationY);
+
+        boolean movementValid = false;
+
+        if (turn != originPiece.getColor()) {
+            return false;
+        }
+
+        if (destinationPiece != null && originPiece.getColor().equals(destinationPiece.getColor())) {
+            return false;
+        }
+
+        if (destinationPiece != null) {
+            movementValid = originPiece.isEatingMovementPossible(originX, originY, destinationX, destinationY);
+        }
+
+        if (destinationPiece == null) {
+            movementValid = originPiece.isMovementPossible(originX, originY, destinationX, destinationY);
+        }
+        return movementValid;
+    }
+
 
     private MovementStatus getMovementStatus(DomainBoard domainBoard, MoveDto move, PieceColor turno, List<Move> moves){
         MovementStatus movementStatus = checkSpecialMoves(domainBoard,moves,move, turno);
-
         if (movementStatus == null ) {
-            if (!isPieceMovementValid(domainBoard.getBoard(), move, turno) || positionHandler.arePiecesInBetween(domainBoard.getBoard(), move))  {
+            if (!isPieceMovementValid(domainBoard, move, turno) || positionHandler.arePiecesInBetween(domainBoard, move))  {
                 return new MovementStatus(false, MovementState.NOT_POSSIBLE, null);
             }
-            movementStatus = new MovementStatus(true,MovementState.POSSIBLE,new StandardMove(move, domainBoard.getBoard()[move.getDestinationX()][move.getDestinationY()]));
-        }
-        if (movementStatus.getState() == MovementState.PAWN_PROMOTION) {
-            if (!isPieceMovementValid(domainBoard.getBoard(), move, turno) || positionHandler.arePiecesInBetween(domainBoard.getBoard(), move))  {
-                return new MovementStatus(false, MovementState.NOT_POSSIBLE, null);
+            movementStatus = checkPawnPromotion(domainBoard, move, turno, new PawnPromotionValidatorImpl());
+            if (movementStatus == null) {
+                movementStatus = new MovementStatus(true, MovementState.POSSIBLE, new StandardMove(move, domainBoard.getPiece(move.getDestinationX(),move.getDestinationY())));
             }
         }
         return movementStatus;
@@ -119,55 +116,41 @@ public class MoveValidatorHandler {
         if (specialMove != null){
             return specialMove;
         }
-        specialMove = checkPawnPromotion(domainBoard, moves, move, turno, new PawnPromotionValidatorImpl());
-        if (specialMove != null){
-            return specialMove;
-        }
         specialMove = checkEnPassant(domainBoard, moves, move, turno, new EnPassantMoveValidatorImpl());
         return specialMove;
-
     }
 
-    private MovementStatus checkPawnPromotion(DomainBoard domainBoard, List<Move> moves, MoveDto move, PieceColor turno, PawnPromotionValidator pawnPromotionValidator){
-        boolean isPawnPromotionPossible = pawnPromotionValidator.isPawnPromotionPossible(domainBoard.getBoard(), move, turno);
+    private MovementStatus checkPawnPromotion(DomainBoard domainBoard , MoveDto move, PieceColor turno, PawnPromotionValidator pawnPromotionValidator){
+        boolean isPawnPromotionPossible = pawnPromotionValidator.isPawnPromotionPossible(domainBoard, move, turno);
         if (isPawnPromotionPossible) {
-            return new MovementStatus(true, MovementState.PAWN_PROMOTION,new PawnPromotion(move,domainBoard.getBoard()[move.getOriginX()][move.getOriginY()],domainBoard.getBoard()[move.getDestinationX()][move.getDestinationY()],null )) ;
+            return new MovementStatus(true, MovementState.PAWN_PROMOTION,new PawnPromotion(move,domainBoard.getPiece(move.getOriginX(),move.getOriginY()),domainBoard.getPiece(move.getDestinationX(),move.getDestinationY()),null )) ;
         }
         return null;
     }
     private MovementStatus checkCastling(DomainBoard domainBoard, List<Move> moves, MoveDto move, PieceColor turno, CastlingMoveValidator castlingMoveValidator){
-        Move castlingMove = castlingMoveValidator.getCastlingMoveIfPossible(domainBoard.getBoard(), new PositionDto(move.getOriginX(), move.getOriginY()), move, turno, moves, positionHandler, checkMovementHandler);
+        Move castlingMove = castlingMoveValidator.getCastlingMoveIfPossible(domainBoard, new PositionDto(move.getOriginX(), move.getOriginY()), move, turno, moves, positionHandler, checkMovementHandler);
         if (castlingMove != null) {
             return  new  MovementStatus(true, MovementState.POSSIBLE, castlingMove);
         }
         return null;
     }
     private MovementStatus checkEnPassant(DomainBoard domainBoard, List<Move> moves, MoveDto move, PieceColor turno, EnPassantMoveValidator enPassantMoveValidator){
-        EnPassantMove enPassantMove = enPassantMoveValidator.getEnPassantMoveIfPossible(moves, domainBoard.getBoard(), new PositionDto(move.getOriginX(), move.getOriginY()), turno, move);
+        EnPassantMove enPassantMove = enPassantMoveValidator.getEnPassantMoveIfPossible(moves, domainBoard, new PositionDto(move.getOriginX(), move.getOriginY()), turno, move);
         if (enPassantMove != null) {
             return new MovementStatus(true,MovementState.POSSIBLE,enPassantMove);
         }
         return null;
     }
 
-
     private MovementStatus isMoveValid(DomainBoard domainBoard, Move moveToBeMade, MovementState movementState, PieceColor turno){
         domainBoard.makeMove(moveToBeMade);
         domainBoard.logMove(moveToBeMade);  // we need to log the move so its added to the list of moves, that way we can undo it later
-        if (!checkMovementHandler.isKingCheck(domainBoard.getBoard(), turno)) {
+        if (!checkMovementHandler.isKingCheck(domainBoard, turno)) {
             domainBoard.undoMove();
             return new MovementStatus(true, movementState, moveToBeMade);
         } else {
             domainBoard.undoMove();
             return new MovementStatus(false, MovementState.NOT_POSSIBLE, null);
         }
-    }
-
-    public PositionHandler getPositionHandler() {
-        return positionHandler;
-    }
-
-    public CheckMovementHandlerImpl getCheckMovementHandler() {
-        return checkMovementHandler;
     }
 }

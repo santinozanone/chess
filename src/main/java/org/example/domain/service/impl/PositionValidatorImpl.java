@@ -1,17 +1,20 @@
 package org.example.domain.service.impl;
 
+import org.example.domain.board.DomainBoard;
 import org.example.domain.board.movements.Move;
 import org.example.domain.board.piece.Piece;
 import org.example.domain.board.piece.PieceColor;
+import org.example.domain.service.interfaces.PositionValidator;
 import org.example.domain.strategy.FilterStrategy;
 import org.example.domain.strategy.implementation.PieceNotNullStrategy;
 import org.example.dto.MoveDto;
 import org.example.dto.PositionDto;
+import org.example.presentation.implementation.Board;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PositionHandler {
+public class PositionValidatorImpl implements PositionValidator {
     /*  - Get the position of a piece of the board
         - detecting if a square is being attacked
         - getting positions between to pieces
@@ -19,9 +22,9 @@ public class PositionHandler {
          -detecting if there are pieces in between  */
 
 
-    public List<PositionDto> getPositionsInBetween(Piece board[][], FilterStrategy filterStrategy, int originX, int originY, int destinationX, int destinationY) {
+    public List<PositionDto> getPositionsInBetween(DomainBoard board, FilterStrategy filterStrategy, int originX, int originY, int destinationX, int destinationY) {
         List<PositionDto> piecesInBetween = new ArrayList<>();
-        if (!(Math.abs(originX - destinationX) == 2 && Math.abs(originY - destinationY) == 1) || ((Math.abs((originX - destinationX)) == 1) && (Math.abs((originY - destinationY)) == 2)))/*VERIFICA QUE NO SEA MOVIMIENTO DE CABALLO*/ {
+        if (!isHorseMovement(originX, originY, destinationX, destinationY)){
             int rowSpaces = Math.abs(originX - destinationX);
             int columnSpaces = Math.abs(originY - destinationY);
 
@@ -39,36 +42,37 @@ public class PositionHandler {
     }
 
 
-    public boolean arePiecesInBetween(Piece board[][], MoveDto move) {
+    public boolean arePiecesInBetween(DomainBoard board, MoveDto move) {
         int originX = move.getOriginX(), originY = move.getOriginY(), destinationX = move.getDestinationX(), destinationY = move.getDestinationY();
         boolean arePiecesInBetween = false;
-        if (!(Math.abs(originX - destinationX) == 2 && Math.abs(originY - destinationY) == 1) || ((Math.abs((originX - destinationX)) == 1) && (Math.abs((originY - destinationY)) == 2)))/*VERIFICA QUE NO SEA MOVIMIENTO DE CABALLO*/ {
+        if (!isHorseMovement(originX, originY, destinationX, destinationY))/*VERIFICA QUE NO SEA MOVIMIENTO DE CABALLO*/ {
             arePiecesInBetween = (getPositionsInBetween(board, new PieceNotNullStrategy(), move.getOriginX(), move.getOriginY(), move.getDestinationX(), move.getDestinationY()).size()) != 0;
         }
         return arePiecesInBetween;
     }
 
-    public int[] getPiecePosition(Piece board[][], Class<? extends Piece> piece, PieceColor turno) {
-        int positions[] = new int[2];
+    public PositionDto getPiecePosition(DomainBoard board, Class<? extends Piece> piece, PieceColor turno) {
+        PositionDto positionDto = null;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (board[i][j] != null && board[i][j].getClass().equals(piece) && board[i][j].getColor().equals(turno)) {
-                    positions[0] = i;
-                    positions[1] = j;
+                Piece boardPiece = board.getPiece(i,j);
+                if (boardPiece != null && boardPiece.getClass().equals(piece) && boardPiece.getColor().equals(turno)) {
+                    positionDto = new PositionDto(i,j);
                 }
             }
         }
-        return positions;
+        return positionDto;
     }
 
 
-    public boolean isSquareBeingAttacked(Piece board[][],PositionDto square ,PieceColor turno) {
+    public boolean isSquareBeingAttacked(DomainBoard board,PositionDto square ,PieceColor turno) {
         int x = square.getX();
         int y = square.getY();
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 MoveDto move = new MoveDto(i, j, x, y);
-                if (board[i][j] != null && board[i][j].getColor() != turno && board[i][j].isEatingMovementPossible(i, j, x, y) && !arePiecesInBetween(board, move)) {
+                Piece piece = board.getPiece(i, j);
+                if (piece != null && piece.getColor() != turno && piece.isEatingMovementPossible(i, j, x, y) && !arePiecesInBetween(board, move)) {
                     return true;
                 }
             }
@@ -76,7 +80,7 @@ public class PositionHandler {
         return false;
     }
 
-    public  boolean getIfPieceHasMoved(PositionDto positionOfPieceToVerify, List<Move> moves) {
+    public  boolean hasPieceMoved(PositionDto positionOfPieceToVerify, List<Move> moves) {
         for (Move moveMade : moves) {
             if (moveMade.getMoveDto().getOriginX() == positionOfPieceToVerify.getX() && moveMade.getMoveDto().getOriginY() == positionOfPieceToVerify.getY()) {
                 return true; // the piece has moved
@@ -86,37 +90,39 @@ public class PositionHandler {
     }
 
 
-    private List<PositionDto> getVerticalPositionsInBetween(Piece[][] board, int originX, int destinationX,int originY ,FilterStrategy filterStrategy){
+    private boolean isHorseMovement(int originX, int originY, int destinationX, int destinationY){
+        return ((Math.abs(originX - destinationX) == 2 && Math.abs(originY - destinationY) == 1) || ((Math.abs((originX - destinationX)) == 1) && (Math.abs((originY - destinationY)) == 2)));
+    }
+
+    private List<PositionDto> getVerticalPositionsInBetween(DomainBoard board, int originX, int destinationX,int originY ,FilterStrategy filterStrategy){
         List<PositionDto> piecesInBetween = new ArrayList<>();
         for (Integer i : getNumbersInBetween(originX, destinationX)) {
-            if (filterStrategy.filter(board[i][originY])) piecesInBetween.add(new PositionDto(originX, i));
+            if (filterStrategy.filter(board.getPiece(i, originY))) piecesInBetween.add(new PositionDto(originX, i));
         }
         return piecesInBetween;
     }
 
-    private List<PositionDto> getHorizontalPositionsInBetween(Piece[][] board, int originY, int destinationY,int originX ,FilterStrategy filterStrategy){
+    private List<PositionDto> getHorizontalPositionsInBetween(DomainBoard board, int originY, int destinationY,int originX ,FilterStrategy filterStrategy){
         List<PositionDto> piecesInBetween = new ArrayList<>();
         for (Integer i : getNumbersInBetween(originY, destinationY)) {
-            if (filterStrategy.filter(board[originX][i])) piecesInBetween.add(new PositionDto(originX, i));
+            if (filterStrategy.filter(board.getPiece(originX, i))) piecesInBetween.add(new PositionDto(originX, i));
         }
         return piecesInBetween;
     }
 
 
 
-    private List<PositionDto> getDiagonalPositionsInBetween(Piece[][] board, int originX, int destinationX, int originY, int destinationY, FilterStrategy filterStrategy ){
+    private List<PositionDto> getDiagonalPositionsInBetween(DomainBoard board, int originX, int destinationX, int originY, int destinationY, FilterStrategy filterStrategy ){
         List<PositionDto> piecesInBetween = new ArrayList<>();
         List<Integer> xPositions = getNumbersInBetween(originX,destinationX);
         List<Integer> yPositions =getNumbersInBetween(originY, destinationY);
         for (int i = 0;i<xPositions.size();i++){
-            if (filterStrategy.filter(board[xPositions.get(i)][yPositions.get(i)])) {
+            if (filterStrategy.filter(board.getPiece(xPositions.get(i),yPositions.get(i)))) {
                 piecesInBetween.add(new PositionDto(xPositions.get(i),yPositions.get(i)));
             }
         }
         return piecesInBetween;
     }
-
-
 
     private List<Integer> getNumbersInBetween(int firstNumber,int secondNumber){
         List<Integer> numbersInBetween = new ArrayList<>();
@@ -131,6 +137,4 @@ public class PositionHandler {
             else return numbersInBetween;
         }
     }
-
-
 }

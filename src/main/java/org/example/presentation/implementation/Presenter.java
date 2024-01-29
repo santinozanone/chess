@@ -65,7 +65,7 @@ public class Presenter implements IPresenter {
 
     private void firstBoxClicked( int originX,int originY, Button [][] buttonMatrix){
         firstBoxClicked = buttonMatrix[originX][originY];
-        positions = game.getPieceMoves(originX, originY);
+        positions = game.getPieceValidMovements(originX, originY);
         positions.add(new PositionDto(originX,originY));
         windowBoard.paintButtons(positions);
         buttonCounter++;

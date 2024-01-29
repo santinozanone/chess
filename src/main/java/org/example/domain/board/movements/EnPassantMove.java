@@ -29,9 +29,7 @@ public class EnPassantMove extends StandardMove {
         board[positionDto.getX()][positionDto.getY()] = super.getPieceEaten();
     }
 
-    public PositionDto getPositionDto() {
-        return positionDto;
-    }
+
 
     @Override
     public String toString() {
