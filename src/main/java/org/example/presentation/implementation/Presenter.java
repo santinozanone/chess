@@ -1,6 +1,6 @@
 package org.example.presentation.implementation;
 
-import org.example.domain.application.Game;
+import org.example.application.Game;
 import org.example.dto.MovementStatus;
 import org.example.domain.board.GameStatus;
 import org.example.domain.board.MovementState;
@@ -47,19 +47,17 @@ public class Presenter implements IPresenter {
            new PawnPromotionWindow(game.getTurn(),game, movementStatus.getMove());
         }
         GameStatus gameStatus = game.getGameStatus();
-
-        if (gameStatus == GameStatus.KING_IN_CHECK){
-            windowBoard.displayMessage( gameStatus.getValue(),movementStatus.getState().getValue());
-        }
-        else if (gameStatus == GameStatus.CHECKMATE){
-             // should display checkmate window
-        }
-        else if (gameStatus == GameStatus.STALEMATE){
-              // should display stalemate window
-        }
         windowBoard.displayMessage( gameStatus.getValue(),movementStatus.getState().getValue());
 
-        windowBoard.unPaintButtons(positions);
+        if (gameStatus == GameStatus.KING_IN_CHECK){
+            windowBoard.unPaintButtons(positions);
+        }
+        else if (gameStatus == GameStatus.CHECKMATE || gameStatus == GameStatus.STALEMATE){
+            windowBoard.unPaintButtons(positions);
+            new ResetWindow(game);
+            windowBoard.displayMessage("","");
+        }
+        else if (gameStatus == GameStatus.ACTIVE) windowBoard.unPaintButtons(positions);
         windowBoard.displayTurn(game.getTurn().toString());
     }
 

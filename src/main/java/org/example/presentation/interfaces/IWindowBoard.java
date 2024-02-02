@@ -10,7 +10,7 @@ import java.util.List;
 public interface IWindowBoard {
     Button[][] getButtons();
 
-    void initializeBoard();
+
     void paintButtons(List<PositionDto> positions);
     void unPaintButtons(List<PositionDto> positions);
 

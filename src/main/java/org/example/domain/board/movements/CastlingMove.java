@@ -2,6 +2,7 @@ package org.example.domain.board.movements;
 
 import org.example.domain.board.piece.Piece;
 import org.example.dto.MoveDto;
+import org.example.dto.PositionDto;
 
 public class CastlingMove implements Move{
     private MoveDto rookMovement;
@@ -29,14 +30,16 @@ public class CastlingMove implements Move{
     }
 
     @Override
-    public MoveDto getMoveDto() {
-        return kingMovement;
+    public boolean hasPositionMoved(PositionDto positionOfPieceToVerify) {
+        for (MoveDto moveDto: new MoveDto[]{kingMovement,rookMovement})
+            if (moveDto.getOriginX() == positionOfPieceToVerify.getX() && moveDto.getOriginY() == positionOfPieceToVerify.getY()) {
+                return true; // the piece has moved
+            }
+        return false;
     }
 
     @Override
-    public String toString() {
-        return "CastlingMove{" +
-                "King=" + kingMovement +
-                '}' + "\n rook " + rookMovement;
+    public MoveDto getMoveDto() {
+        return kingMovement;
     }
 }

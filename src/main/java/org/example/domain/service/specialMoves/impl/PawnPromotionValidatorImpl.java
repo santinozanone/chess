@@ -1,8 +1,7 @@
 package org.example.domain.service.specialMoves.impl;
 
 import org.example.domain.board.DomainBoard;
-import org.example.domain.board.piece.Peon;
-import org.example.domain.board.piece.Piece;
+import org.example.domain.board.piece.Pawn;
 import org.example.domain.board.piece.PieceColor;
 import org.example.domain.service.specialMoves.interfaces.PawnPromotionValidator;
 import org.example.dto.MoveDto;
@@ -14,7 +13,7 @@ public class PawnPromotionValidatorImpl implements PawnPromotionValidator {
         if (turn == PieceColor.BLACK) {
             destinationX = 7;
         }
-        if (!(board.getPiece(moveToBeMade.getOriginX(),moveToBeMade.getOriginY()) instanceof Peon)) {
+        if (!(board.getPiece(moveToBeMade.getOriginX(),moveToBeMade.getOriginY()) instanceof Pawn)) {
             return false;
         }
             if (moveToBeMade.getDestinationX() == destinationX) {

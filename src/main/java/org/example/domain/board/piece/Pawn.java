@@ -1,8 +1,8 @@
 package org.example.domain.board.piece;
 
-public class Peon extends Piece {
+public class Pawn extends Piece {
 
-    public Peon(PieceColor color) {
+    public Pawn(PieceColor color) {
         super(color);
     }
 
@@ -17,8 +17,6 @@ public class Peon extends Piece {
         } else {
             movement = blackMovement;
         }
-
-
 
         if  ( (getColor().equals(PieceColor.BLACK) && originX != 1) || (getColor().equals(PieceColor.WHITE) && originX != 6) ) { // verify if pawn is at its original position
             return movement;
@@ -35,8 +33,6 @@ public class Peon extends Piece {
         boolean movement;
         boolean whiteMovement = ((originX - destinationX) == 1) && (originY - destinationY == 1) || ((originX - destinationX) == 1) && (originY - destinationY == -1);
         boolean blackMovement = (((originX - destinationX) == -1) && (originY - destinationY) == -1) || (((originX - destinationX) == -1) && (originY - destinationY) == 1);
-
-
         if (getColor().equals(PieceColor.WHITE)) {
             if (((originX - destinationX) == 1) && (originY - destinationY == 0)) {
                 movement = false;
@@ -50,10 +46,6 @@ public class Peon extends Piece {
                 movement = blackMovement;
             }
         }
-
         return movement;
-
     }
-
-
 }

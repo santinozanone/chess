@@ -13,7 +13,7 @@ import org.example.dto.PositionDto;
 import java.util.List;
 
 public interface CastlingMoveValidator {
-    Move getCastlingMoveIfPossible(DomainBoard board, PositionDto actualPosition, MoveDto moveToMake, PieceColor turn, List<Move> moves, PositionValidator positionHandler, CheckMovementValidator checkMovementValidator);
+    Move getCastlingMoveIfPossible(DomainBoard board, MoveDto moveToMake, PieceColor turn, List<Move> moves, PositionValidator positionHandler, CheckMovementValidator checkMovementValidator);
 }
 
 

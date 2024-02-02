@@ -20,21 +20,14 @@ public class EnPassantMove extends StandardMove {
 
     @Override
     public void undoMove(Piece[][] board) {
-        int originX = super.getMoveDto().getOriginX();
-        int originY =  super.getMoveDto().getOriginY();
-        int destinationX =  super.getMoveDto().getDestinationX();
-        int destinationY =  super.getMoveDto().getDestinationY();
+        int originX = getMoveDto().getOriginX();
+        int originY =  getMoveDto().getOriginY();
+        int destinationX =  getMoveDto().getDestinationX();
+        int destinationY =  getMoveDto().getDestinationY();
         board[originX][originY] = board[destinationX][destinationY];
         board[destinationX][destinationY] = null;
         board[positionDto.getX()][positionDto.getY()] = super.getPieceEaten();
     }
 
 
-
-    @Override
-    public String toString() {
-        return "EnPassantMove{" +
-                "piece to be eaten=" + positionDto +
-                '}';
-    }
 }

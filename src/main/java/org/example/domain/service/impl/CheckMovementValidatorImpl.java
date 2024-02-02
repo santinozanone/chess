@@ -3,7 +3,7 @@ package org.example.domain.service.impl;
 import org.example.domain.board.DomainBoard;
 import org.example.domain.board.piece.Piece;
 import org.example.domain.board.piece.PieceColor;
-import org.example.domain.board.piece.Rey;
+import org.example.domain.board.piece.King;
 import org.example.domain.service.interfaces.CheckMovementValidator;
 import org.example.domain.service.interfaces.PositionValidator;
 import org.example.dto.MoveDto;
@@ -30,7 +30,7 @@ public class CheckMovementValidatorImpl implements CheckMovementValidator {
 
     public List<PositionDto> getPiecesCheckingKing(DomainBoard board, PieceColor turno) {
         List<PositionDto> checkerPieces = new ArrayList<>();
-        PositionDto positionDto = positionHandler.getPiecePosition(board, Rey.class, turno);
+        PositionDto positionDto = positionHandler.getPiecePosition(board, King.class, turno);
         int kingX = positionDto.getX();
         int kingY = positionDto.getY();
         for (int i = 0; i < 8; i++) {

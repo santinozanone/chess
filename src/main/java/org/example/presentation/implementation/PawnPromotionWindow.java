@@ -1,6 +1,6 @@
 package org.example.presentation.implementation;
 
-import org.example.domain.application.Game;
+import org.example.application.Game;
 import org.example.domain.board.movements.Move;
 import org.example.domain.board.movements.PawnPromotion;
 import org.example.domain.board.piece.Piece;
@@ -32,11 +32,12 @@ public class PawnPromotionWindow implements ActionListener {
         dialog.setMinimumSize(new Dimension(500,500));
         dialog.setLayout(new GridLayout(1,4));
         loadButtons(dialog);
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
 
-    private void loadButtons(JDialog imagePanel){
-        String[] PIECES = {"Torre.png", "Caballo.png", "Alfil.png", "Reina.png"};
+    private void loadButtons(JDialog jDialog){
+        String[] PIECES = {"Rook.png", "Knight.png", "Bishop.png", "Queen.png"};
         java.net.URL imgURL;
         String colorUrl= "/whitePieces/";
         if (turn == PieceColor.BLACK) colorUrl = "/blackPieces/";
@@ -46,13 +47,13 @@ public class PawnPromotionWindow implements ActionListener {
             imageButton.addActionListener(this);
             imgURL = getClass().getResource(colorUrl + PIECES[i]);
             imageButton.setIcon(new ImageIcon(imgURL));
-            imagePanel.add(imageButton);
+            jDialog.add(imageButton);
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String[] PIECES = {"Torre", "Caballo", "Alfil", "Reina"};
+        String[] PIECES = {"Rook", "Knight", "Bishop", "Queen"};
         JButton button = (JButton) e.getSource();
         button.getName();
         Class<?> clazz = null;

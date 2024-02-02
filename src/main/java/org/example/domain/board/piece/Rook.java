@@ -1,16 +1,14 @@
 package org.example.domain.board.piece;
 
-public class Alfil extends Piece {
+public class Rook extends Piece {
 
-    public Alfil(PieceColor color) {
+    public Rook(PieceColor color) {
         super(color);
     }
 
     @Override
     public boolean isMovementPossible(int originX, int originY, int destinationX, int destinationY) {
-        int rowspaces = Math.abs(originX - destinationX);
-        int columnSpaces = Math.abs(originY - destinationY);
-        return  rowspaces == columnSpaces;
+       return Math.abs(originX-destinationX) == 0 || Math.abs(originY - destinationY) == 0;
     }
 
     @Override

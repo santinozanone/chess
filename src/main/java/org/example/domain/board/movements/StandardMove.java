@@ -2,6 +2,7 @@ package org.example.domain.board.movements;
 
 import org.example.domain.board.piece.Piece;
 import org.example.dto.MoveDto;
+import org.example.dto.PositionDto;
 
 public class StandardMove implements Move{
     private MoveDto moveDto;
@@ -32,19 +33,22 @@ public class StandardMove implements Move{
 
     }
 
+    @Override
+    public boolean hasPositionMoved(PositionDto positionOfPieceToVerify) {
+        if (moveDto.getOriginX() == positionOfPieceToVerify.getX() && moveDto.getOriginY() == positionOfPieceToVerify.getY()) {
+            return true; // the piece has moved
+        }
+        return false;
+    }
+
     protected Piece getPieceEaten() {
         return pieceEaten;
     }
 
+    @Override
     public MoveDto getMoveDto() {
         return moveDto;
     }
 
-    @Override
-    public String toString() {
-        return "StandardMove{" +
-                "moveDto=" + moveDto +
-                ", pieceEaten=" + pieceEaten +
-                '}';
-    }
+
 }

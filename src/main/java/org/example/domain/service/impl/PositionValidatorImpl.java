@@ -9,7 +9,6 @@ import org.example.domain.strategy.FilterStrategy;
 import org.example.domain.strategy.implementation.PieceNotNullStrategy;
 import org.example.dto.MoveDto;
 import org.example.dto.PositionDto;
-import org.example.presentation.implementation.Board;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +44,7 @@ public class PositionValidatorImpl implements PositionValidator {
     public boolean arePiecesInBetween(DomainBoard board, MoveDto move) {
         int originX = move.getOriginX(), originY = move.getOriginY(), destinationX = move.getDestinationX(), destinationY = move.getDestinationY();
         boolean arePiecesInBetween = false;
-        if (!isHorseMovement(originX, originY, destinationX, destinationY))/*VERIFICA QUE NO SEA MOVIMIENTO DE CABALLO*/ {
+        if (!isHorseMovement(originX, originY, destinationX, destinationY)) {
             arePiecesInBetween = (getPositionsInBetween(board, new PieceNotNullStrategy(), move.getOriginX(), move.getOriginY(), move.getDestinationX(), move.getDestinationY()).size()) != 0;
         }
         return arePiecesInBetween;
@@ -81,10 +80,10 @@ public class PositionValidatorImpl implements PositionValidator {
     }
 
     public  boolean hasPieceMoved(PositionDto positionOfPieceToVerify, List<Move> moves) {
-        for (Move moveMade : moves) {
-            if (moveMade.getMoveDto().getOriginX() == positionOfPieceToVerify.getX() && moveMade.getMoveDto().getOriginY() == positionOfPieceToVerify.getY()) {
-                return true; // the piece has moved
-            }
+        for (Move moveToVerify : moves) {
+           if (moveToVerify.hasPositionMoved(positionOfPieceToVerify)){
+               return true;
+           }
         }
         return false;
     }

@@ -2,8 +2,6 @@ package org.example.domain.board;
 
 import org.example.domain.board.movements.Move;
 import org.example.domain.board.piece.*;
-import org.example.presentation.Button;
-import org.example.presentation.implementation.Board;
 import org.example.presentation.interfaces.IWindowBoard;
 
 import java.util.ArrayList;
@@ -34,6 +32,15 @@ public class DomainBoard   {
         }
     }
 
+    public void resetBoard(){
+        clearBoard();
+        loadPieces(whites, PieceColor.WHITE);
+        loadPieces(black, PieceColor.BLACK);
+        loadBoard(board, whites, black);
+        notifyChange();
+        moveList.clear();
+    }
+
     public Piece getPiece(int x, int y){
         return board[x][y];
     }
@@ -56,25 +63,32 @@ public class DomainBoard   {
         return moveList;
     }
 
+    private void clearBoard(){
+        for (int i =0;i<8;i++){
+            for (int j =0;j<8;j++){
+                board[i][j] = null;
+            }
+        }
+    }
 
     private void loadPieces(Piece pieces[], PieceColor color) {
-        pieces[0] = new Torre(color);
-        pieces[1] = new Caballo(color);
-        pieces[2] = new Alfil(color);
-        pieces[3] = new Reina(color);
-        pieces[4] = new Rey(color);
-        pieces[5] = new Alfil(color);
-        pieces[6] = new Caballo(color);
-        pieces[7] = new Torre(color);
+        pieces[0] = new Rook(color);
+        pieces[1] = new Knight(color);
+        pieces[2] = new Bishop(color);
+        pieces[3] = new Queen(color);
+        pieces[4] = new King(color);
+        pieces[5] = new Bishop(color);
+        pieces[6] = new Knight(color);
+        pieces[7] = new Rook(color);
     }
 
     private void loadBoard(Piece board[][], Piece whites[], Piece blacks[]) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (i == 1) {
-                    board[i][j] = new Peon(PieceColor.BLACK);
+                    board[i][j] = new Pawn(PieceColor.BLACK);
                 } else if (i == 6) {
-                    board[i][j] = new Peon(PieceColor.WHITE);
+                    board[i][j] = new Pawn(PieceColor.WHITE);
                 }
 
             }

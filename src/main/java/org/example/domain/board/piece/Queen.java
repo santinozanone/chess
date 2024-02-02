@@ -1,17 +1,17 @@
 package org.example.domain.board.piece;
 
-public class Reina extends Piece{
+public class Queen extends Piece{
 
 
-    public Reina(PieceColor color) {
+    public Queen(PieceColor color) {
         super(color);
     }
 
     @Override
     public boolean isMovementPossible(int originX, int originY, int destinationX, int destinationY) {
-        int rowspaces = Math.abs(originX - destinationX);
+        int rowSpaces = Math.abs(originX - destinationX);
         int columnSpaces = Math.abs(originY - destinationY);
-        boolean diagonal = rowspaces == columnSpaces;
+        boolean diagonal = rowSpaces == columnSpaces;
         boolean horizontalOrVertical = Math.abs(originX-destinationX) == 0 || Math.abs(originY - destinationY) == 0;
         return  diagonal  || horizontalOrVertical;
 

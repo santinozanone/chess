@@ -1,4 +1,4 @@
-package org.example.domain.application;
+package org.example.application;
 
 import org.example.domain.board.DomainBoard;
 import org.example.domain.board.GameStatus;
@@ -43,6 +43,11 @@ public class Game {
             switchTurn();
     }
 
+    public void resetGame(){
+        board.resetBoard();
+        resetTurn();
+    }
+
     public GameStatus getGameStatus(){
        if (checkMovementValidator.isKingCheck(board, turn)){
             if (new CheckMateValidatorImpl(positionValidator, moveValidatorHandler, checkMovementValidator).isCheckMate(board, board.getMoveList(), turn)) {
@@ -68,5 +73,8 @@ public class Game {
         return moveValidatorHandler.getPossibleMovesOfPiece(board,board.getMoveList(), new PositionDto(originX, originY), turn);
     }
 
+    private void resetTurn(){
+        turn = PieceColor.WHITE;
+    }
 
 }
